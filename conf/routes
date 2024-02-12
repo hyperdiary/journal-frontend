@@ -1,0 +1,13 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# https://www.playframework.com/documentation/latest/ScalaRouting
+# ~~~~
+
+# An example controller showing a sample home page
+GET     /journal                        org.hyperdiary.journal.controllers.JournalController.index()
+GET     /journal/:id                    org.hyperdiary.journal.controllers.JournalController.view(id: String)
+GET     /journal/:id/entry/:entryId     org.hyperdiary.journal.controllers.JournalController.viewEntry(id: String, entryId: String)
+                                                                                   
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
