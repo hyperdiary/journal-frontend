@@ -7,8 +7,11 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "3.3.1"
 
-libraryDependencies += guice
-libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.0" % Test
+libraryDependencies ++= Seq(
+  guice,
+  "org.apache.jena" % "jena-core" % "4.10.0",
+  "org.apache.jena" % "jena-arq" % "4.10.0",
+  "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.0" % Test)
 
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "org.hyperdiary.controllers._"
