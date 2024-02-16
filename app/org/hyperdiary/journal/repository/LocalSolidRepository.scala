@@ -31,7 +31,7 @@ class LocalSolidRepository @Inject() (solidClient: SolidClient)
   }
 
   override def getLabelLink(labelText: String): Option[String] = {
-    val labelLocalName = labelText.replace(' ','_').replaceAll("[.']","")
+    val labelLocalName = labelText.replace(' ','_').replaceAll("^\\.","").replaceAll("[,'()]","").replaceAll("\\.$","").replace("(","").replace(")","")
     val labelUri = uri"http://krw.localhost:3000/label/$labelLocalName"
     val response = solidClient.getResource(labelUri, "text/turtle")
     response.body match {
