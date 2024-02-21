@@ -1,5 +1,18 @@
-@()
+@import org.hyperdiary.journal.models.JournalHtml
 
-@main("Welcome to Play") {
-<h1>Welcome to Play!</h1>
+@(journal: JournalHtml)
+
+@main(journal.title) {
+<header class="w3-container w3-teal">
+    <h1>@journal.title</h1>
+    <h5>@journal.subtitle</h5>
+</header>
+<article class="w3-container w3-monospace">
+    <ul>
+        @for(entry <- journal.entries) {
+        <li><a href="@entry.uri">@entry.title</a></li>
+        }
+    </ul>
+</article>
+<footer class="w3-container w3-teal"></footer>
 }

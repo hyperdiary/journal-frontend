@@ -11,4 +11,8 @@ object HyperDiary {
 
   val Entry: Resource = ResourceFactory.createResource(s"${uri}Entry")
 
+  val Journal: Resource = ResourceFactory.createResource(s"${uri}Journal")
+
+  val hasEntry: Property = ResourceFactory.createProperty(s"${uri}hasEntry")
+
 }

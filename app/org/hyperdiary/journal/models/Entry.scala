@@ -6,7 +6,7 @@ import org.hyperdiary.journal.vocabulary.HyperDiary
 
 import scala.jdk.CollectionConverters.*
 
-case class Entry(title: String, paragraphs: List[Paragraph])
+case class Entry(id: String, title: String, paragraphs: List[Paragraph])
 object Entry {
   def fromModel(model: Model): Option[Entry] = model
       .listSubjectsWithProperty(RDF.`type`, HyperDiary.Entry)
@@ -14,8 +14,23 @@ object Entry {
       .toList
       .headOption
       .flatMap { entry =>
-        Some(Entry(getEntryTitle(entry), getParagraphs(model)))
+        Some(Entry(getEntryId(entry), getEntryTitle(entry), getParagraphs(model)))
       }
+
+  private def getEntryId(entry: Resource) = {
+    if (entry.hasProperty(DCTerms.identifier)) {
+      val idObject = entry.getProperty(DCTerms.identifier).getObject
+      if (idObject.isLiteral) {
+        idObject.asLiteral().getString
+      } else {
+        // TODO log incorrect object type
+        ""
+      }
+    } else {
+      // TODO log missing title statement
+      ""
+    }
+  }
 
   private def getEntryTitle(entry: Resource): String = {
     if (entry.hasProperty(DCTerms.title)) {

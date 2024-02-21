@@ -24,14 +24,17 @@ class JournalController @Inject()(val controllerComponents: ControllerComponents
     Ok(org.hyperdiary.journal.views.html.index())
   }
 
-  def view(id: String) = Action { implicit request: Request[AnyContent] =>
-    Ok(org.hyperdiary.journal.views.html.journal())
+  def view(journalId: String): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    journalService.getJournal(journalId) match {
+      case Some(journal) => Ok(org.hyperdiary.journal.views.html.journal(journal))
+      case _ => NotFound("No journal found")
+    }
   }
 
   def viewEntry(journalId: String, entryId: String): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     journalService.getEntry(journalId,entryId) match {
       case Some(entry) =>     Ok(org.hyperdiary.journal.views.html.entry(entry))
-      case _ => NotFound("No record found")
+      case _ => NotFound("No entry found")
     }
   }
 

@@ -1,6 +1,6 @@
 package org.hyperdiary.journal.repository
 import org.apache.jena.rdf.model.ModelFactory
-import org.hyperdiary.journal.models.{Entry, Paragraph}
+import org.hyperdiary.journal.models.{Entry, Journal, Paragraph}
 import org.hyperdiary.solid.client.SolidClient
 import sttp.client3.UriContext
 
@@ -18,6 +18,17 @@ class LocalSolidRepository @Inject() (solidClient: SolidClient)
 //        Paragraph(2, "How the hell did I find ![myself] in this situation at the tender age of 18. Dear reader I shall explain and return to this wintry scene in due course."),
 //        Paragraph(3, "![My father] also joined the ![Armed Forces] in the ![previous World War] and found himself in a tricky situation. He was mad about horses and desperately wanted to learn to ride. A nearby unit of the ![Army Service Corps] (![Territorial Army]) provided the opportunity, so in 1913 he joined up and achieved his equestrian aim. Unfortunately, he also achieved the distinction of being part of what the ![Kaiser] called a \"Contemptible Little Army\" and was sent to ![France] with the ![British Expeditionary Force] as soon as war was declared. He had met and become engaged to ![my mother] before departure and neither of them realised that this war was not to be, as the widely held belief was expressed,\" over by Christmas. In fact, it was to be five years before he finally came home, but he regarded himself as lucky because his unit was transferred to ![Salonika] where they became part of what was to be known as the ![Balkan War]. The ![British] element later became known as the \"Forgotten Army\" in this fierce conflict largely out of the eye of the ![British] public. The war in ![France] meanwhile degenerated into the slaughter of trench warfare. It is a sobering thought that had ![my father] remained in ![France] his chances of survival would have been slim, as an original member of the BEF, and I would not be writing this account.")
 //      )))
+
+  override def getJournal(journalUri: String): Option[Journal] = {
+    val response = solidClient.getResource(uri"$journalUri", "text/turtle")
+    response.body match {
+      case Right(entry) =>
+        val model = ModelFactory.createDefaultModel()
+        model.read(new ByteArrayInputStream(entry.getBytes), journalUri, "TURTLE")
+        Journal.fromModel(model)
+      case _ => None
+    }
+  }
 
   override def getEntry(entryUri: String): Option[Entry] = {
     val response = solidClient.getResource(uri"$entryUri", "text/turtle")
