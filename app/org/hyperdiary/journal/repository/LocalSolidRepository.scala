@@ -40,11 +40,16 @@ class LocalSolidRepository @Inject() extends SolidRepository {
     val labelUri = s"http://krw.localhost:3000/label/$labelLocalName"
     val request = Request.newBuilder().uri(URI.create(labelUri)).GET().build()
     val response = client.send(request, JenaBodyHandlers.ofModel())
-    val model: Model = response.body()
-    val stmt = model.getProperty(
-      model.createResource(s"http://krw.hyperdiary.io/label/$labelLocalName"),
-      model.createProperty("http://hyperdiary.io/terms/", "isLabelFor")
-    )
-    Some(stmt.getObject.toString)
+    if(response.body().isEmpty) {
+      None
+    } else {
+      val model = response.body()
+      val stmt = model.getProperty(
+        model.createResource(s"http://krw.hyperdiary.io/label/$labelLocalName"),
+        model.createProperty("http://hyperdiary.io/terms/", "isLabelFor")
+      )
+      Some(stmt.getObject.toString)
+    }
+
   }
 }
