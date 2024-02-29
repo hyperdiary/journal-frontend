@@ -1,0 +1,9 @@
+export MY_SOLID_IDP=http://localhost:3000/
+echo $MY_SOLID_IDP
+export MY_SOLID_CLIENT_ID=journal_frontend_99fc39fe-93f6-434a-ac1d-a68c254d2525
+echo $MY_SOLID_CLIENT_ID
+export MY_SOLID_CLIENT_SECRET=96a1645b1067c2324fea241278a0494ae81bd2f968080dd6d870fbcb0e54a6f3e4fbf6bedd97a248af93c4219e063df6c9eab9ecd8337f2ddf97cb97686a404b
+echo $MY_SOLID_CLIENT_SECRET
+export MY_AUTH_FLOW=client_secret_basic
+echo $MY_AUTH_FLOW
+sbt run

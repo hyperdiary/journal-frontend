@@ -14,14 +14,15 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class LocalSolidRepository @Inject() extends SolidRepository {
 
-//  private val session: Session = OpenIdSession.ofClientCredentials(
-//    URI.create(System.getenv("MY_SOLID_IDP")),
-//    System.getenv("MY_SOLID_CLIENT_ID"),
-//    System.getenv("MY_SOLID_CLIENT_SECRET"),
-//    System.getenv("MY_AUTH_FLOW")
-//  )
+  private val session: Session = OpenIdSession.ofClientCredentials(
+    new URI("http://localhost:3000/"),
+    "journal_frontend_fc81ae65-01c5-4326-bc01-f131f16e9d4d",
+    "915b739357468e6734d23dd08594b3a8ed8d6e38f3aa3837c8356eac19fb26a8185fa5dec9432ab138d019722801042960a9171f26679964f2cf048b1be2a7a5",
+    "client_secret_basic"
+  )
 
-  private val client: SolidSyncClient = SolidSyncClient.getClient //.session(session)
+  private val client: SolidSyncClient =
+    SolidSyncClient.getClient //.session(session)
 
   override def getJournal(journalUri: String): Option[Journal] = {
     val request = Request.newBuilder().uri(URI.create(journalUri)).GET().build()
@@ -36,11 +37,17 @@ class LocalSolidRepository @Inject() extends SolidRepository {
   }
 
   override def getLabelLink(labelText: String): Option[String] = {
-    val labelLocalName = labelText.replace(' ', '_').replaceAll("^\\.", "").replaceAll("[,'()]", "").replaceAll("\\.$", "").replace("(", "").replace(")", "")
+    val labelLocalName = labelText
+      .replace(' ', '_')
+      .replaceAll("^\\.", "")
+      .replaceAll("[,'()]", "")
+      .replaceAll("\\.$", "")
+      .replace("(", "")
+      .replace(")", "")
     val labelUri = s"http://krw.localhost:3000/label/$labelLocalName"
     val request = Request.newBuilder().uri(URI.create(labelUri)).GET().build()
     val response = client.send(request, JenaBodyHandlers.ofModel())
-    if(response.body().isEmpty) {
+    if (response.body().isEmpty) {
       None
     } else {
       val model = response.body()

@@ -17,6 +17,7 @@ libraryDependencies ++= Seq(
   "com.inrupt.client" % "inrupt-client-openid" % "1.1.0",
   "com.inrupt.client" % "inrupt-client-jena" % "1.1.0",
   "com.inrupt.client" % "inrupt-client-okhttp" % "1.1.0",
+  "com.inrupt.client" % "inrupt-client-jackson" % "1.1.0",
   //"org.hyperdiary" %% "solid-client-scala" % "0.1.0-SNAPSHOT",
   "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.0" % Test)
 
