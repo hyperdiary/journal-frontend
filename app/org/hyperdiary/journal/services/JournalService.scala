@@ -49,7 +49,7 @@ class JournalService @Inject()(solidRepository: SolidRepository) {
     }.sorted
   }
 
-  private def updateUri(uri: String): String = uri.replace("hyperdiary.io","localhost:3000")
+  private def updateUri(uri: String): String = uri.replace("krw.hyperdiary.io","localhost:9000")
 
   private def getJournalLink(journalId: String, entryId: String): String = s"/journal/$journalId/entry/$entryId"
 
