@@ -45,11 +45,13 @@ class JournalService @Inject()(solidRepository: SolidRepository) {
 
   private def getEntryLinks(journal: Journal): List[EntryLink] = {
     journal.entries.flatMap { entryUri =>
-      solidRepository.getEntry(updateUri(entryUri)).flatMap(entry => Some(EntryLink(entry.id, getJournalLink(journal.id, entry.id), entry.title)))
+      solidRepository.getEntry(updateUri(entryUri)).flatMap { entry =>
+        Some(EntryLink(entry.id, getJournalLink(journal.id, entry.id), entry.title))
+      }
     }.sorted
   }
 
-  private def updateUri(uri: String): String = uri.replace("krw.hyperdiary.io","localhost:9000")
+  private def updateUri(uri: String): String = uri.replace("krw.hyperdiary.io","krw.localhost:3000")
 
   private def getJournalLink(journalId: String, entryId: String): String = s"/journal/$journalId/entry/$entryId"
 
