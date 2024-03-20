@@ -1,8 +1,11 @@
-@()
+@import org.hyperdiary.journal.models.{Person,LabelledLink}
+@import java.time.format.DateTimeFormatter
+
+@(title: String, dates: String, dateFormat: DateTimeFormatter, person: Person)
 
 @main("Welcome to Play") {
 <header class="w3-container w3-teal">
-    <h1>Kenneth</h1>
+    <h1>@{person.givenName + " " + person.surname}</h1>
     <h5>1926-2018</h5>
 </header>
 <article class="w3-container w3-monospace">
@@ -12,69 +15,100 @@
             <table class="w3-table w3-padding w3-striped">
                 <tr>
                     <td>Given name</td>
-                    <td>Kenneth Robert</td>
+                    <td>@person.givenName</td>
                 </tr>
                 <tr>
                     <td>Surname</td>
-                    <td>Walpole</td>
+                    <td>@person.surname</td>
                 </tr>
                 <tr>
                     <td>Gender</td>
-                    <td>male</td>
+                    <td>@person.gender</td>
                 </tr>
-                <tr>
-                    <td>Birth date</td>
-                    <td>8th August 1926</td>
-                </tr>
-                <tr>
-                    <td>Birth place</td>
-                    <td><a href="">Rochford</a></td>
-                </tr>
-                <tr>
-                    <td>Death date</td>
-                    <td>20th July 2018</td>
-                </tr>
-                <tr>
-                    <td>Death place</td>
-                    <td><a href="">Exeter</a></td>
-                </tr>
+                @if(person.birthDate.nonEmpty) {
+                    <tr>
+                        <td>Birth date</td>
+                        <td>@person.birthDate.get.format(dateFormat)</td>
+                    </tr>
+                }
+                @if(person.birthPlace.nonEmpty) {
+                    <tr>
+                        <td>Birth place</td>
+                        <td><a href="@person.birthPlace.get.uri">@person.birthPlace.get.label</a></td>
+                    </tr>
+                }
+                @if(person.deathDate.nonEmpty) {
+                    <tr>
+                        <td>Death date</td>
+                        <td>@person.deathDate.get.format(dateFormat)</td>
+                    </tr>
+                }
+                @if(person.deathPlace.nonEmpty) {
+                    <tr>
+                        <td>Death place</td>
+                        <td><a href="@person.deathPlace.get.uri">@person.deathPlace.get.label</a></td>
+                    </tr>
+                }
                 <tr>
                     <td>Parents</td>
-                    <td><a href="">Louisa</a> and <a href="">Ernest</a></td>
+                    <td>
+                    @if(person.parents.mother.uri.nonEmpty) {
+                        <a href="@person.parents.mother.uri.get">@person.parents.mother.label</a>
+                    } else {
+                        @person.parents.mother.label
+                    } and
+                    @if(person.parents.father.uri.nonEmpty) {
+                        <a href="@person.parents.father.uri.get">@person.parents.father.label</a>
+                    } else {
+                        @person.parents.father.label
+                    }
                 </tr>
-                <tr>
-                    <td>Siblings</td>
-                    <td><a href="">Peggy</a></td>
-                </tr>
-                <tr>
-                    <td>Children</td>
-                    <td><a href="">Lois</a>, <a href="">Peter</a>, <a href="">Robert</a></td>
-                </tr>
+                @if(!person.siblings.isEmpty) {
+                    <tr>
+                        <td>Siblings</td>
+                        <td>
+                        @for(sibling <- person.siblings) {
+                            <a href="@sibling.uri">@sibling.label</a>
+                        }
+                        </td>
+                    </tr>
+                }
+                @if(!person.children.isEmpty) {
+                    <tr>
+                        <td>Children</td>
+                        <td>
+                        @for(child <- person.children) {
+                            <a href="@child.uri">@child.label</a>
+                        }
+                        </td>
+                    </tr>
+                }
             </table>
             <h2>Education</h2>
             <ul class="w3-ul">
-                <li><a href="">Manchester Grammar School</a></li>
-                <li><a href="">Ridgewood High School (New Jersey)</a></li>
-                <li><a href="">Ramsey High School (New Jersey)</a></li>
-                <li><a href="">Staff College, Camberley</a></li>
-                <li><a href="">Henley Business School</a></li>
+            @for(educationalEstablishment <- person.educationalEstablishments) {
+                <li><a href="@educationalEstablishment.uri">@educationalEstablishment.label</a></li>
+            }
             </ul>
             <h2>Employment</h2>
             <ul class="w3-ul">
-                <li><a href="">Royal Navy</a></li>
-                <li><a href="">British Army</a></li>
+            @for(employer <- person.employers) {
+                <li><a href="@employer.uri">@employer.label</a></li>
+            }
             </ul>
-            <h2>Military units</h2>
-            <ul class="w3-ul">
-                <li><a href="">HMS Birmingham</a></li>
-                <li><a href="">Royal Artillery</a></li>
-            </ul>
+            @if(!person.militaryUnits.isEmpty) {
+                <h2>Military units</h2>
+                <ul class="w3-ul">
+                @for(militaryUnit <- person.militaryUnits) {
+                    <li><a href="@militaryUnit.uri">@militaryUnit.label</a></li>
+                }
+                </ul>
+            }
             <h2>Residences</h2>
             <ul class="w3-ul">
-                <li><a href="">1935</a></li>
-                <li><a href="">1944</a></li>
-                <li><a href="">1977-1987</a></li>
-                <li><a href="">1987-2018</a></li>
+            @for(residence <- person.residences) {
+                <li><a href="@residence.uri">@residence.label</a></li>
+            }
             </ul>
             <h2>Related images</h2>
             <ul class="w3-ul">

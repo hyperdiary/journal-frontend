@@ -11,4 +11,5 @@ trait SolidRepository {
   def getEntry(entryUri: String): Option[Entry]
   
   def getLabelLink(labelText: String): Option[String]
+  
 }
