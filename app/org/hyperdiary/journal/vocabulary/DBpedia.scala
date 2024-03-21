@@ -8,4 +8,7 @@ object DBpedia {
 
   val subtitle: Property = ResourceFactory.createProperty(s"${uri}subtitle")
 
+  val parent: Property = ResourceFactory.createProperty(s"${uri}parent")
+
+
 }

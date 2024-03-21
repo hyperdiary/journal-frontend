@@ -5,7 +5,7 @@ import com.inrupt.client.jena.JenaBodyHandlers
 import com.inrupt.client.openid.OpenIdSession
 import com.inrupt.client.solid.SolidSyncClient
 import org.apache.jena.rdf.model.{Model, ModelFactory}
-import org.hyperdiary.journal.models.{Entry, Journal}
+import org.hyperdiary.journal.models.{Entry, Journal, Person}
 
 import java.io.ByteArrayInputStream
 import java.net.URI
@@ -57,6 +57,11 @@ class LocalSolidRepository @Inject() extends SolidRepository {
       )
       Some(stmt.getObject.toString)
     }
+  }
 
+  override def getPerson(personUri: String): Option[Person] = {
+    val request = Request.newBuilder().uri(URI.create(personUri)).GET().build()
+    val response = client.send(request, JenaBodyHandlers.ofModel())
+    Person.fromModel(response.body())
   }
 }

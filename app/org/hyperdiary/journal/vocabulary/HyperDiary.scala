@@ -1,7 +1,6 @@
 package org.hyperdiary.journal.vocabulary
 
-import org.apache.jena.rdf.model.{Property, Resource, ResourceFactory}
-import org.apache.jena.vocabulary.RDF.Init
+import org.apache.jena.rdf.model.{ Property, Resource, ResourceFactory }
 
 object HyperDiary {
 

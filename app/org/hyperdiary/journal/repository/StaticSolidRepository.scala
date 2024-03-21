@@ -1,13 +1,13 @@
 package org.hyperdiary.journal.repository
-import org.hyperdiary.journal.models.{Entry, Journal, Paragraph}
+import org.hyperdiary.journal.models.{ Entry, Journal, Paragraph, Person }
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.{ Inject, Singleton }
 
 @Singleton
 class StaticSolidRepository @Inject() extends SolidRepository {
 
   override def getJournal(journalUri: String): Option[Journal] = Some(
-    Journal("J1","Amphibian", List.empty, Some("A Small Slice of History"))
+    Journal("J1", "Amphibian", List.empty, Some("A Small Slice of History"))
   )
 
   override def getEntry(entryUri: String): Option[Entry] =
@@ -34,5 +34,16 @@ class StaticSolidRepository @Inject() extends SolidRepository {
 
   override def getLabelLink(labelText: String): Option[String] = Some(
     "https://en.wikipedia.org/wiki/HMS_Birmingham_(C19)"
+  )
+
+  override def getPerson(personUri: String): Option[Person] = Some(
+    Person(
+      "I100194342000",
+      "Kenneth Robert",
+      "Walpole",
+      "male",
+      List("http://krw.hyperdiary.io/person/I100194545786", "http://krw.hyperdiary.io/person/I100194342016"),
+      Some("Kenneth")
+    )
   )
 }

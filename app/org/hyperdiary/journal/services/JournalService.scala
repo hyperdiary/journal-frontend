@@ -7,7 +7,7 @@ import play.twirl.api.Html
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class JournalService @Inject()(solidRepository: SolidRepository) {
+class JournalService @Inject()(solidRepository: SolidRepository) extends BaseService {
   
   def getJournal(journalId: String): Option[JournalHtml] = {
     val journalUri = s"http://krw.localhost:3000/journal/$journalId"
@@ -51,7 +51,6 @@ class JournalService @Inject()(solidRepository: SolidRepository) {
     }.sorted
   }
 
-  private def updateUri(uri: String): String = uri.replace("krw.hyperdiary.io","krw.localhost:3000")
 
   private def getJournalLink(journalId: String, entryId: String): String = s"/journal/$journalId/entry/$entryId"
 
