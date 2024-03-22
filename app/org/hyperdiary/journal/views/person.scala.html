@@ -28,7 +28,10 @@
                 @if(person.birthDate.nonEmpty) {
                     <tr>
                         <td>Birth date</td>
-                        <td>@person.birthDate.get.format(dateFormat)</td>
+                        @person.birthDate.get match {
+                            case Right(date) => { <td>@date.format(dateFormat)</td> }
+                            case Left(dateString) => { <td>@dateString</td> }
+                        }
                     </tr>
                 }
                 @if(person.birthPlace.nonEmpty) {

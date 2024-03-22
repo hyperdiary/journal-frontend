@@ -1,6 +1,6 @@
 package org.hyperdiary.journal.models
 
-import org.apache.jena.rdf.model.{Model, Resource}
+import org.apache.jena.rdf.model.{Model, Property, Resource}
 import org.apache.jena.sparql.vocabulary.FOAF
 import org.apache.jena.vocabulary.{DCTerms, RDF, RDFS}
 import org.hyperdiary.journal.vocabulary.DBpedia
@@ -14,7 +14,9 @@ case class Person(
   familyName: String,
   gender: String,
   parentUris: List[String],
-  label: Option[String] = None  
+  label: Option[String] = None,
+  birthDate: Option[String] = None,
+  birthPlace: Option[String] = None
 )
 object Person extends RDFUtils {
   def fromModel(model: Model): Option[Person] = {
@@ -30,8 +32,10 @@ object Person extends RDFUtils {
         familyName <- getFamilyName(personResource)
         gender     <- getGender(personResource)
         parents    <- getParents(personResource)
-        label      <- Try(getLabel(personResource))
-      } yield Person(identifier, givenName, familyName, gender, parents, label)
+        label      <- getOptionalLiteral(personResource, RDFS.label)
+        birthDate <-  getOptionalLiteral(personResource, DBpedia.birthDate)
+        birthPlace <- getOptionalResource(personResource, DBpedia.birthPlace)
+      } yield Person(identifier, givenName, familyName, gender, parents, label, birthDate, birthPlace)
       person match {
         case Success(value) => Some(value)
         case Failure(e)     => None // TODO log error
@@ -69,12 +73,16 @@ object Person extends RDFUtils {
     }
   }
 
-  private def getLabel(person: Resource): Option[String] =
-    Option(person.getProperty(RDFS.label)).flatMap { labelStmt =>
-      Try(labelStmt.getObject.asLiteral()) match {
-        case Success(labelLit) => Some(labelLit.getString)
-        case Failure(e)        => None // TODO log error not a literal
-      }
+  private def getOptionalResource(person: Resource, property: Property): Try[Option[String]] = Try {
+    Option(person.getProperty(property)).flatMap { statement =>
+      Some(statement.getObject.asResource().getURI)
     }
+  }
 
+  private def getOptionalLiteral(person: Resource, property: Property): Try[Option[String]] = Try {
+    Option(person.getProperty(property)).flatMap { literalStatement =>
+      Some(literalStatement.getObject.asLiteral().getString)
+    }
+  }
+  
 }

@@ -10,5 +10,13 @@ object DBpedia {
 
   val parent: Property = ResourceFactory.createProperty(s"${uri}parent")
 
+  val birthDate: Property = ResourceFactory.createProperty(s"${uri}birthDate")
+
+  val birthPlace: Property = ResourceFactory.createProperty(s"${uri}birthPlace")
+
+  val deathDate: Property = ResourceFactory.createProperty(s"${uri}deathDate")
+
+  val deathPlace: Property = ResourceFactory.createProperty(s"${uri}birthPlace")
+
 
 }
