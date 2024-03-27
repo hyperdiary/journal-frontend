@@ -1,7 +1,7 @@
 package org.hyperdiary.journal.repository
 
 import org.apache.jena.riot.RDFDataMgr
-import org.hyperdiary.journal.models.{Entry, Journal}
+import org.hyperdiary.journal.models.{Entry, Journal, Person}
 
 class TestSolidRepository extends SolidRepository {
 
@@ -14,4 +14,6 @@ class TestSolidRepository extends SolidRepository {
   override def getJournal(journalUri: String): Option[Journal] = ???
 
   override def getLabelLink(labelText: String): Option[String] = ???
+
+  override def getPerson(personUri: String): Option[Person] = ???
 }

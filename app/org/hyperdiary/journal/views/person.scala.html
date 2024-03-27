@@ -43,7 +43,10 @@
                 @if(person.deathDate.nonEmpty) {
                     <tr>
                         <td>Death date</td>
-                        <td>@person.deathDate.get.format(dateFormat)</td>
+                        @person.deathDate.get match {
+                            case Right(date) => { <td>@date.format(dateFormat)</td> }
+                            case Left(dateString) => { <td>@dateString</td> }
+                        }
                     </tr>
                 }
                 @if(person.deathPlace.nonEmpty) {

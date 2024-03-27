@@ -1,5 +1,6 @@
 package org.hyperdiary.journal.services
 
+import org.hyperdiary.journal.connectors.DBpediaConnector
 import org.hyperdiary.journal.models.*
 import org.hyperdiary.journal.repository.SolidRepository
 
@@ -22,7 +23,10 @@ class PersonService @Inject() (solidRepository: SolidRepository) extends BaseSer
       person.familyName,
       person.gender,
       getParents(person.parentUris),
-      getBirthDate(person.birthDate)
+      getEventDate(person.birthDate),
+      getLabelledLink(person.birthPlace),
+      getEventDate(person.deathDate),
+      getLabelledLink(person.deathPlace)
     )
   }
 
@@ -45,21 +49,21 @@ class PersonService @Inject() (solidRepository: SolidRepository) extends BaseSer
       case _ => Father()
     }
 
-  private def getBirthDate(maybeBirthDate: Option[String]): Option[Either[String, LocalDate]] = {
+  private def getEventDate(maybeEventDate: Option[String]): Option[Either[String, LocalDate]] = {
     val datePattern = "(18|19)[0-9]{2}-[01][0-9]-[0123][0-9]".r
-    maybeBirthDate.flatMap { dateString =>
+    maybeEventDate.flatMap { dateString =>
       datePattern.findFirstIn(dateString) match {
         case Some(date) => Some(Right(LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE)))
         case None       => Some(Left(dateString))
       }
     }
   }
-  
-//  private def getBirthPlace(maybeBirthPlace: Option[String]): Option[LabelledLink] = {
-//    maybeBirthPlace.flatMap { birthPlace =>
-//      
-//    }
-//  }
+
+  private def getLabelledLink(maybeUri: Option[String]): Option[LabelledLink] =
+    for {
+      uri   <- maybeUri
+      label <- DBpediaConnector.getLabel(uri)
+    } yield LabelledLink(label, new URI(uri))
 
   def getExamplePerson: PersonHtml =
     PersonHtml(
@@ -77,7 +81,7 @@ class PersonService @Inject() (solidRepository: SolidRepository) extends BaseSer
           new URI("http://dbpedia.org/resource/Rochford")
         )
       ),
-      Some(LocalDate.parse("2018-07-20")),
+      Some(Right(LocalDate.parse("2018-07-20"))),
       Some(
         LabelledLink(
           "Exeter",

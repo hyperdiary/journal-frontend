@@ -1,12 +1,12 @@
 package org.hyperdiary.journal.models
 
-import org.apache.jena.rdf.model.{Model, Property, Resource}
+import org.apache.jena.rdf.model.{ Model, Property, Resource }
 import org.apache.jena.sparql.vocabulary.FOAF
-import org.apache.jena.vocabulary.{DCTerms, RDF, RDFS}
+import org.apache.jena.vocabulary.{ DCTerms, RDF, RDFS }
 import org.hyperdiary.journal.vocabulary.DBpedia
 
 import scala.jdk.CollectionConverters.*
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
 case class Person(
   identifier: String,
@@ -16,7 +16,9 @@ case class Person(
   parentUris: List[String],
   label: Option[String] = None,
   birthDate: Option[String] = None,
-  birthPlace: Option[String] = None
+  birthPlace: Option[String] = None,
+  deathDate: Option[String] = None,
+  deathPlace: Option[String] = None
 )
 object Person extends RDFUtils {
   def fromModel(model: Model): Option[Person] = {
@@ -33,19 +35,32 @@ object Person extends RDFUtils {
         gender     <- getGender(personResource)
         parents    <- getParents(personResource)
         label      <- getOptionalLiteral(personResource, RDFS.label)
-        birthDate <-  getOptionalLiteral(personResource, DBpedia.birthDate)
+        birthDate  <- getOptionalLiteral(personResource, DBpedia.birthDate)
         birthPlace <- getOptionalResource(personResource, DBpedia.birthPlace)
-      } yield Person(identifier, givenName, familyName, gender, parents, label, birthDate, birthPlace)
+        deathDate  <- getOptionalLiteral(personResource, DBpedia.deathDate)
+        deathPlace <- getOptionalResource(personResource, DBpedia.deathPlace)
+      } yield Person(
+        identifier,
+        givenName,
+        familyName,
+        gender,
+        parents,
+        label,
+        birthDate,
+        birthPlace,
+        deathDate,
+        deathPlace
+      )
       person match {
         case Success(value) => Some(value)
         case Failure(e)     => None // TODO log error
       }
     }
   }
-  
+
   private def getIdentifier(person: Resource): Try[String] =
     for {
-      statement <- Try(person.getRequiredProperty(DCTerms.identifier))
+      statement  <- Try(person.getRequiredProperty(DCTerms.identifier))
       identifier <- Try(statement.getObject.asLiteral().getString)
     } yield identifier
 
@@ -84,5 +99,5 @@ object Person extends RDFUtils {
       Some(literalStatement.getObject.asLiteral().getString)
     }
   }
-  
+
 }

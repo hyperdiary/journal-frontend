@@ -4,7 +4,9 @@ import com.inrupt.client.auth.Session
 import com.inrupt.client.jena.JenaBodyHandlers
 import com.inrupt.client.openid.OpenIdSession
 import com.inrupt.client.solid.SolidSyncClient
-import org.apache.jena.rdf.model.{Model, ModelFactory}
+import org.apache.jena.query.QueryFactory
+import org.apache.jena.rdf.model.{Model, ModelFactory, RDFNode}
+import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder
 import org.hyperdiary.journal.models.{Entry, Journal, Person}
 
 import java.io.ByteArrayInputStream
@@ -22,7 +24,7 @@ class LocalSolidRepository @Inject() extends SolidRepository {
   )
 
   private val client: SolidSyncClient =
-    SolidSyncClient.getClient //.session(session)
+    SolidSyncClient.getClient // .session(session)
 
   override def getJournal(journalUri: String): Option[Journal] = {
     val request = Request.newBuilder().uri(URI.create(journalUri)).GET().build()
@@ -58,7 +60,7 @@ class LocalSolidRepository @Inject() extends SolidRepository {
       Some(stmt.getObject.toString)
     }
   }
-
+  
   override def getPerson(personUri: String): Option[Person] = {
     val request = Request.newBuilder().uri(URI.create(personUri)).GET().build()
     val response = client.send(request, JenaBodyHandlers.ofModel())
