@@ -6,6 +6,8 @@ object DBpedia {
 
   private val uri = "http://dbpedia.org/ontology/"
 
+  val Place: Resource = ResourceFactory.createResource(s"${uri}Place")
+
   val subtitle: Property = ResourceFactory.createProperty(s"${uri}subtitle")
 
   val parent: Property = ResourceFactory.createProperty(s"${uri}parent")
@@ -21,6 +23,11 @@ object DBpedia {
   val sibling: Property = ResourceFactory.createProperty(s"${uri}sibling")
 
   val spouse: Property = ResourceFactory.createProperty(s"${uri}spouse")
+
+  val startDate: Property = ResourceFactory.createProperty(s"${uri}startDate")
+
+  val endDate: Property = ResourceFactory.createProperty(s"${uri}endDate")
+
 
   val child: Property = ResourceFactory.createProperty(s"${uri}child")
 

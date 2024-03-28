@@ -7,7 +7,7 @@ import org.hyperdiary.journal.vocabulary.{ DBpedia, HyperDiary }
 import scala.jdk.CollectionConverters.*
 import scala.util.{ Failure, Success }
 
-case class Residence(identifier: String, date: String, locationUri: String)
+case class Residence(locationUri: String, date: Option[String], startDate: Option[String], endDate: Option[String])
 object Residence extends RdfResource {
 
   def fromModel(model: Model): Option[Residence] = {
@@ -18,13 +18,15 @@ object Residence extends RdfResource {
       .headOption
     maybeResidenceResource.flatMap { residenceResource =>
       val residence = for {
-        identifier  <- getRequiredLiteral(residenceResource, DCTerms.identifier)
-        date        <- getRequiredLiteral(residenceResource, DCTerms.date)
         locationUri <- getRequiredResource(residenceResource, DBpedia.location)
+        date        <- getOptionalLiteral(residenceResource, DCTerms.date)
+        startDate   <- getOptionalLiteral(residenceResource, DBpedia.startDate)
+        endDate     <- getOptionalLiteral(residenceResource, DBpedia.endDate)
       } yield Residence(
-        identifier,
+        locationUri,
         date,
-        locationUri
+        startDate,
+        endDate
       )
       residence match {
         case Success(value) => Some(value)

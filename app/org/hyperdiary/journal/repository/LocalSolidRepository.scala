@@ -73,5 +73,9 @@ class LocalSolidRepository @Inject() extends SolidRepository {
     Residence.fromModel(response.body())
   }
 
-  override def getPlace(placeUri: String): Option[Place] = ???
+  override def getPlace(placeUri: String): Option[Place] = {
+    val request = Request.newBuilder().uri(URI.create(placeUri)).GET().build()
+    val response = client.send(request, JenaBodyHandlers.ofModel())
+    Place.fromModel(response.body())
+  }
 }

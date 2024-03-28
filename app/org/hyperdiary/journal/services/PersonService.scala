@@ -56,18 +56,6 @@ class PersonService @Inject() (solidRepository: SolidRepository) extends BaseSer
       case _ => Father()
     }
 
-//  private def getSiblings(siblingUris: List[String]): List[LabelledLink] = {
-//    val siblings = siblingUris.map(siblingUri =>
-//      solidRepository.getPerson(updateUri(siblingUri))
-//    )
-//    siblings.flatten.map { sibling =>
-//      LabelledLink(
-//        sibling.label.getOrElse(sibling.givenName),
-//        new URI(s"$frontendBaseUri/person/${sibling.identifier}")
-//      )
-//    }
-//  }
-
   private def getPersonLinks(personUris: List[String]): List[LabelledLink] = {
     val people = personUris.map(personUri => solidRepository.getPerson(updateUri(personUri)))
     people.flatten.map { person =>
@@ -78,26 +66,26 @@ class PersonService @Inject() (solidRepository: SolidRepository) extends BaseSer
     }
   }
 
-  private def getResidenceLinks(residenceUris: List[String]): List[LabelledLink] = {
-    val residences = residenceUris.map(residenceUri => solidRepository.getResidence(updateUri(residenceUri)))
-    residences.flatten.flatMap { residence =>
-      solidRepository
-        .getPlace(residence.locationUri)
-        .flatMap(place => Some(LabelledLink(s"${place.label} (${residence.date})", new URI(place.identifier))))
+  private def getResidenceLinks(residenceUris: List[String]): List[LabelledLink] =
+    for {
+      residence <- getResidences(residenceUris)
+      place     <- solidRepository.getPlace(updateUri(residence.locationUri))
+    } yield LabelledLink(getResidenceLabel(residence, place), new URI(s"$frontendBaseUri/place/${place.identifier}"))
+
+  def getResidenceLabel(residence: Residence, place: Place): String = {
+    val placeLabel = place.label
+    if (residence.date.nonEmpty) {
+      s"$placeLabel (${residence.date})" // FIXME - this is an Option
+    } else {
+      placeLabel
     }
   }
 
-//  private def getResidenceLinks(residenceUris: List[String]): List[LabelledLink] = {
-//    val residences = residenceUris.map(residenceUri =>
-//      solidRepository.getResidence(updateUri(residenceUri))
-//    )
-//    residences.flatten.map { residence =>
-//      LabelledLink(
-//        residence.label.getOrElse(residence.givenName),
-//        new URI(s"$frontendBaseUri/person/${person.identifier}")
-//      )
-//    }
-//  }
+  private def getResidences(residenceUris: List[String]): List[Residence] =
+    for {
+      residenceUri <- residenceUris
+      residence    <- solidRepository.getResidence(updateUri(residenceUri))
+    } yield residence
 
   private def getEventDate(maybeEventDate: Option[String]): Option[Either[String, LocalDate]] = {
     val datePattern = "(18|19|20)[0-9]{2}-[01][0-9]-[0123][0-9]".r
