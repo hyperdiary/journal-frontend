@@ -7,7 +7,7 @@ import com.inrupt.client.solid.SolidSyncClient
 import org.apache.jena.query.QueryFactory
 import org.apache.jena.rdf.model.{Model, ModelFactory, RDFNode}
 import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder
-import org.hyperdiary.journal.models.{Entry, Journal, Person}
+import org.hyperdiary.journal.models.{Entry, Journal, Person, Place, Residence}
 
 import java.io.ByteArrayInputStream
 import java.net.URI
@@ -66,4 +66,12 @@ class LocalSolidRepository @Inject() extends SolidRepository {
     val response = client.send(request, JenaBodyHandlers.ofModel())
     Person.fromModel(response.body())
   }
+
+  override def getResidence(residenceUri: String): Option[Residence] = {
+    val request = Request.newBuilder().uri(URI.create(residenceUri)).GET().build()
+    val response = client.send(request, JenaBodyHandlers.ofModel())
+    Residence.fromModel(response.body())
+  }
+
+  override def getPlace(placeUri: String): Option[Place] = ???
 }

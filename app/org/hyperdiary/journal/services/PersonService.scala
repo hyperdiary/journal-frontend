@@ -12,10 +12,10 @@ import javax.inject.{ Inject, Singleton }
 @Singleton
 class PersonService @Inject() (solidRepository: SolidRepository) extends BaseService {
 
-  private val personBaseUri = s"$baseUri/person/"
+  private val solidPersonBaseUri = s"$solidBaseUri/person/"
 
   def getPerson(personId: String): Option[PersonHtml] = {
-    val personUri = s"$personBaseUri/$personId"
+    val personUri = s"$solidPersonBaseUri/$personId"
     for {
       person <- solidRepository.getPerson(personUri)
     } yield PersonHtml(
@@ -26,7 +26,14 @@ class PersonService @Inject() (solidRepository: SolidRepository) extends BaseSer
       getEventDate(person.birthDate),
       getLabelledLink(person.birthPlace),
       getEventDate(person.deathDate),
-      getLabelledLink(person.deathPlace)
+      getLabelledLink(person.deathPlace),
+      getPersonLinks(person.siblingUris),
+      getPersonLinks(person.spouseUris),
+      getPersonLinks(person.childUris),
+      getLabelledLinks(person.education),
+      getLabelledLinks(person.employers),
+      getLabelledLinks(person.militaryUnits),
+      getResidenceLinks(person.residences)
     )
   }
 
@@ -38,19 +45,62 @@ class PersonService @Inject() (solidRepository: SolidRepository) extends BaseSer
   private def getMother(parents: List[Person]): Mother =
     parents.find(_.gender == "female") match {
       case Some(mother) =>
-        Mother(mother.label.getOrElse(mother.givenName), Some(new URI(s"$personBaseUri/${mother.identifier}")))
+        Mother(mother.label.getOrElse(mother.givenName), Some(new URI(s"$frontendBaseUri/person/${mother.identifier}")))
       case _ => Mother()
     }
 
   private def getFather(parents: List[Person]): Father =
     parents.find(_.gender == "male") match {
       case Some(father) =>
-        Father(father.label.getOrElse(father.givenName), Some(new URI(s"$personBaseUri/${father.identifier}")))
+        Father(father.label.getOrElse(father.givenName), Some(new URI(s"$frontendBaseUri/person/${father.identifier}")))
       case _ => Father()
     }
 
+//  private def getSiblings(siblingUris: List[String]): List[LabelledLink] = {
+//    val siblings = siblingUris.map(siblingUri =>
+//      solidRepository.getPerson(updateUri(siblingUri))
+//    )
+//    siblings.flatten.map { sibling =>
+//      LabelledLink(
+//        sibling.label.getOrElse(sibling.givenName),
+//        new URI(s"$frontendBaseUri/person/${sibling.identifier}")
+//      )
+//    }
+//  }
+
+  private def getPersonLinks(personUris: List[String]): List[LabelledLink] = {
+    val people = personUris.map(personUri => solidRepository.getPerson(updateUri(personUri)))
+    people.flatten.map { person =>
+      LabelledLink(
+        person.label.getOrElse(person.givenName),
+        new URI(s"$frontendBaseUri/person/${person.identifier}")
+      )
+    }
+  }
+
+  private def getResidenceLinks(residenceUris: List[String]): List[LabelledLink] = {
+    val residences = residenceUris.map(residenceUri => solidRepository.getResidence(updateUri(residenceUri)))
+    residences.flatten.flatMap { residence =>
+      solidRepository
+        .getPlace(residence.locationUri)
+        .flatMap(place => Some(LabelledLink(s"${place.label} (${residence.date})", new URI(place.identifier))))
+    }
+  }
+
+//  private def getResidenceLinks(residenceUris: List[String]): List[LabelledLink] = {
+//    val residences = residenceUris.map(residenceUri =>
+//      solidRepository.getResidence(updateUri(residenceUri))
+//    )
+//    residences.flatten.map { residence =>
+//      LabelledLink(
+//        residence.label.getOrElse(residence.givenName),
+//        new URI(s"$frontendBaseUri/person/${person.identifier}")
+//      )
+//    }
+//  }
+
   private def getEventDate(maybeEventDate: Option[String]): Option[Either[String, LocalDate]] = {
-    val datePattern = "(18|19)[0-9]{2}-[01][0-9]-[0123][0-9]".r
+    val datePattern = "(18|19|20)[0-9]{2}-[01][0-9]-[0123][0-9]".r
     maybeEventDate.flatMap { dateString =>
       datePattern.findFirstIn(dateString) match {
         case Some(date) => Some(Right(LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE)))
@@ -58,6 +108,9 @@ class PersonService @Inject() (solidRepository: SolidRepository) extends BaseSer
       }
     }
   }
+
+  private def getLabelledLinks(uriList: List[String]): List[LabelledLink] =
+    uriList.flatMap(uri => getLabelledLink(Some(uri)))
 
   private def getLabelledLink(maybeUri: Option[String]): Option[LabelledLink] =
     for {
@@ -71,8 +124,8 @@ class PersonService @Inject() (solidRepository: SolidRepository) extends BaseSer
       "Walpole",
       "male",
       Parents(
-        Mother("Louisa", Some(new URI("http://krw.localhost:3000/person/I100194545786"))),
-        Father("Ernest", Some(new URI("http://krw.localhost:3000/person/I100194342016")))
+        Mother("Louisa", Some(new URI("http://localhost:9000/person/I100194545786"))),
+        Father("Ernest", Some(new URI("http://localhost:9000/person/I100194342016")))
       ),
       Some(Right(LocalDate.parse("1926-08-08"))),
       Some(
@@ -91,21 +144,27 @@ class PersonService @Inject() (solidRepository: SolidRepository) extends BaseSer
       siblings = List(
         LabelledLink(
           "Peggy",
-          new URI("http://krw.localhost:3000/person/I100194424063")
+          new URI("http://localhost:9000/person/I100194424063")
+        )
+      ),
+      spouses = List(
+        LabelledLink(
+          "Irene",
+          new URI("http://localhost:9000/person/I100194341956")
         )
       ),
       children = List(
         LabelledLink(
           "Lois",
-          new URI("http://krw.localhost:3000/person/I100194342035")
+          new URI("http://localhost:9000/person/I100194342035")
         ),
         LabelledLink(
           "Peter",
-          new URI("http://krw.localhost:3000/person/I100194342029")
+          new URI("http://localhost:9000/person/I100194342029")
         ),
         LabelledLink(
           "Robert",
-          new URI("http://krw.localhost:3000/person/I100194341916")
+          new URI("http://localhost:9000/person/I100194341916")
         )
       ),
       educationalEstablishments = List(
@@ -152,20 +211,20 @@ class PersonService @Inject() (solidRepository: SolidRepository) extends BaseSer
       ),
       residences = List(
         LabelledLink(
-          "1935",
-          new URI("http://krw.localhost:3000/residence/0")
+          "Rosslyn Avenue (1935)",
+          new URI("http://localhost:9000/place/R0")
         ),
         LabelledLink(
-          "1944",
-          new URI("http://krw.localhost:3000/residence/21")
+          "Church Road (1939,1944)",
+          new URI("http://localhost:9000/place/R1")
         ),
         LabelledLink(
-          "1977-1987",
-          new URI("http://krw.localhost:3000/residence/22")
+          "Dornaford Bungalow (1977-1987)",
+          new URI("http://localhost:9000/place/R22")
         ),
         LabelledLink(
-          "1987-2018",
-          new URI("http://krw.localhost:3000/residence/23")
+          "Oak Ridge (1987-2018)",
+          new URI("http://localhost:9000/place/R24")
         )
       )
     )

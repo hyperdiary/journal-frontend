@@ -18,5 +18,18 @@ object DBpedia {
 
   val deathPlace: Property = ResourceFactory.createProperty(s"${uri}deathPlace")
 
+  val sibling: Property = ResourceFactory.createProperty(s"${uri}sibling")
+
+  val spouse: Property = ResourceFactory.createProperty(s"${uri}spouse")
+
+  val child: Property = ResourceFactory.createProperty(s"${uri}child")
+
+  val education: Property = ResourceFactory.createProperty(s"${uri}education")
+
+  val employer: Property = ResourceFactory.createProperty(s"${uri}employer")
+
+  val militaryUnit: Property = ResourceFactory.createProperty(s"${uri}militaryUnit")
+
+  val location: Property = ResourceFactory.createProperty(s"${uri}location")
 
 }

@@ -1,3 +1,3 @@
 package org.hyperdiary.journal.models
 
-case class Place ()
+case class Place(identifier: String, label: String)

@@ -1,12 +1,12 @@
 package org.hyperdiary.journal.models
 
-import org.apache.jena.rdf.model.{ Model, Property, Resource }
+import org.apache.jena.rdf.model.{Model, Property, Resource}
 import org.apache.jena.sparql.vocabulary.FOAF
-import org.apache.jena.vocabulary.{ DCTerms, RDF, RDFS }
-import org.hyperdiary.journal.vocabulary.DBpedia
+import org.apache.jena.vocabulary.{DCTerms, RDF, RDFS}
+import org.hyperdiary.journal.vocabulary.{DBpedia, HyperDiary}
 
 import scala.jdk.CollectionConverters.*
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 case class Person(
   identifier: String,
@@ -18,7 +18,14 @@ case class Person(
   birthDate: Option[String] = None,
   birthPlace: Option[String] = None,
   deathDate: Option[String] = None,
-  deathPlace: Option[String] = None
+  deathPlace: Option[String] = None,
+  siblingUris: List[String] = List.empty,
+  spouseUris: List[String] = List.empty,
+  childUris: List[String] = List.empty,
+  education: List[String] = List.empty,
+  employers: List[String] = List.empty,
+  militaryUnits: List[String] = List.empty,
+  residences: List[String] = List.empty
 )
 object Person extends RDFUtils {
   def fromModel(model: Model): Option[Person] = {
@@ -33,12 +40,19 @@ object Person extends RDFUtils {
         givenName  <- getGivenName(personResource)
         familyName <- getFamilyName(personResource)
         gender     <- getGender(personResource)
-        parents    <- getParents(personResource)
+        parents    <- getObjectUris(personResource, DBpedia.parent)
         label      <- getOptionalLiteral(personResource, RDFS.label)
         birthDate  <- getOptionalLiteral(personResource, DBpedia.birthDate)
         birthPlace <- getOptionalResource(personResource, DBpedia.birthPlace)
         deathDate  <- getOptionalLiteral(personResource, DBpedia.deathDate)
         deathPlace <- getOptionalResource(personResource, DBpedia.deathPlace)
+        siblings   <- getObjectUris(personResource, DBpedia.sibling)
+        spouses    <- getObjectUris(personResource, DBpedia.spouse)
+        children   <- getObjectUris(personResource, DBpedia.child)
+        education <- getObjectUris(personResource, DBpedia.education)
+        employers <- getObjectUris(personResource, DBpedia.employer)
+        militaryUnits <- getObjectUris(personResource, DBpedia.militaryUnit)
+        residences <- getObjectUris(personResource, HyperDiary.residence)
       } yield Person(
         identifier,
         givenName,
@@ -49,12 +63,24 @@ object Person extends RDFUtils {
         birthDate,
         birthPlace,
         deathDate,
-        deathPlace
+        deathPlace,
+        siblings,
+        spouses,
+        children,
+        education,
+        employers,
+        militaryUnits
       )
       person match {
         case Success(value) => Some(value)
         case Failure(e)     => None // TODO log error
       }
+    }
+  }
+
+  private def getObjectUris(person: Resource, property: Property): Try[List[String]] = Try {
+    person.listProperties(property).asScala.toList.map { statement =>
+      statement.getObject.asResource().getURI
     }
   }
 
@@ -81,12 +107,6 @@ object Person extends RDFUtils {
       statement <- Try(person.getRequiredProperty(FOAF.gender))
       gender    <- Try(statement.getObject.asLiteral().getString)
     } yield gender
-
-  private def getParents(person: Resource): Try[List[String]] = Try {
-    person.listProperties(DBpedia.parent).asScala.toList.map { parentStmt =>
-      parentStmt.getObject.asResource().getURI
-    }
-  }
 
   private def getOptionalResource(person: Resource, property: Property): Try[Option[String]] = Try {
     Option(person.getProperty(property)).flatMap { statement =>

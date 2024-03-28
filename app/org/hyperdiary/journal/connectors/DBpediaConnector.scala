@@ -1,6 +1,6 @@
 package org.hyperdiary.journal.connectors
 
-import org.apache.jena.query.QueryFactory
+import org.apache.jena.query.{ QueryFactory, ResultSet }
 import org.apache.jena.rdf.model.RDFNode
 import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder
 
@@ -11,17 +11,22 @@ object DBpediaConnector {
 
   private val builder = QueryExecutionHTTPBuilder.service("https://dbpedia.org/sparql")
 
-  def getLabel(resourceUri: String): Option[String] = {
-    val query = QueryFactory.create(getLabelQuery(resourceUri))
-    builder.query(query)
-    val queryExecution = builder.build()
-    val results = queryExecution.execSelect()
-    val querySolution = results.asScala.toList.headOption
+  def getLabel(resourceUri: String): Option[String] =
     for {
-      solution  <- querySolution
+      results   <- runLabelQuery(resourceUri)
+      solution  <- results.asScala.toList.headOption
       labelNode <- Option(solution.get("label"))
       label     <- getValue(labelNode)
     } yield label
+
+  private def runLabelQuery(resourceUri: String): Option[ResultSet] = Try {
+    val query = QueryFactory.create(getLabelQuery(resourceUri))
+    builder.query(query)
+    val queryExecution = builder.build()
+    queryExecution.execSelect()
+  } match {
+    case Success(results) => Some(results)
+    case Failure(e)       => None // TODO log error
   }
 
   private def getValue(node: RDFNode): Option[String] =

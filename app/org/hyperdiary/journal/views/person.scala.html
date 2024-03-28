@@ -79,6 +79,16 @@
                         </td>
                     </tr>
                 }
+                @if(!person.spouses.isEmpty) {
+                    <tr>
+                        <td>Spouse</td>
+                        <td>
+                        @for(spouse <- person.spouses) {
+                            <a href="@spouse.uri">@spouse.label</a>
+                        }
+                        </td>
+                    </tr>
+                }
                 @if(!person.children.isEmpty) {
                     <tr>
                         <td>Children</td>

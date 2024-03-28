@@ -17,6 +17,7 @@ case class PersonHtml(
   deathDate: Option[Either[String, LocalDate]] = None,
   deathPlace: Option[LabelledLink] = None,
   siblings: List[LabelledLink] = List.empty,
+  spouses: List[LabelledLink] = List.empty,
   children: List[LabelledLink] = List.empty,
   educationalEstablishments: List[LabelledLink] = List.empty,
   employers: List[LabelledLink] = List.empty,
