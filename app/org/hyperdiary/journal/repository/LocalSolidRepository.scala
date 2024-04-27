@@ -45,7 +45,7 @@ class LocalSolidRepository @Inject() extends SolidRepository {
       .replaceAll("[,'()]", "")
       .replaceAll("\\.$", "")
       .replace("(", "")
-      .replace(")", "")
+      .replace(")", "").toLowerCase()
     val labelUri = s"http://krw.localhost:3000/label/$labelLocalName"
     val request = Request.newBuilder().uri(URI.create(labelUri)).GET().build()
     val response = client.send(request, JenaBodyHandlers.ofModel())
