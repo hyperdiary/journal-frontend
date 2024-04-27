@@ -10,13 +10,13 @@ services:
       - ~/Solid:/data
       - ~/solid-config:/config
     image: solidproject/community-server:latest
-  rdf4j-workbench:
-    container_name: rdf4j_dbpedia
-    environment:
-      - JAVA_OPTS=-Xms1g -Xmx20g
-    volumes:
-      - ~/rdf4j:/var/rdf4j
-      - ~/rdf4j-logs:/usr/local/tomcat/logs"
-    ports:
-      - 8080:8080
-    image: eclipse/rdf4j-workbench:latest
+#  rdf4j-workbench:
+#    container_name: rdf4j_dbpedia
+#    environment:
+#      - JAVA_OPTS=-Xms1g -Xmx20g
+#    volumes:
+#      - ~/rdf4j:/var/rdf4j
+#      - ~/rdf4j-logs:/usr/local/tomcat/logs"
+#    ports:
+#      - 8080:8080
+#    image: eclipse/rdf4j-workbench:latest
