@@ -8,13 +8,15 @@ import org.apache.jena.query.QueryFactory
 import org.apache.jena.rdf.model.{Model, ModelFactory, RDFNode}
 import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder
 import org.hyperdiary.journal.models.{Entry, Journal, Person, Place, Residence}
+import org.hyperdiary.journal.services.BaseService
+import org.hyperdiary.journal.vocabulary.HyperDiary
 
 import java.io.ByteArrayInputStream
 import java.net.URI
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class LocalSolidRepository @Inject() extends SolidRepository {
+class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
 
   private val session: Session = OpenIdSession.ofClientCredentials(
     new URI("http://localhost:3000/"),
@@ -46,7 +48,7 @@ class LocalSolidRepository @Inject() extends SolidRepository {
       .replaceAll("\\.$", "")
       .replace("(", "")
       .replace(")", "").toLowerCase()
-    val labelUri = s"http://krw.localhost:3000/label/$labelLocalName"
+    val labelUri = s"$cssPodUri/label/$labelLocalName"
     val request = Request.newBuilder().uri(URI.create(labelUri)).GET().build()
     val response = client.send(request, JenaBodyHandlers.ofModel())
     if (response.body().isEmpty) {
@@ -54,8 +56,8 @@ class LocalSolidRepository @Inject() extends SolidRepository {
     } else {
       val model = response.body()
       val stmt = model.getProperty(
-        model.createResource(s"http://krw.hyperdiary.io/label/$labelLocalName"),
-        model.createProperty("http://hyperdiary.io/terms/", "isLabelFor")
+        model.createResource(s"$podBaseUri/label/$labelLocalName"),
+        model.createProperty(HyperDiary.uri, "isLabelFor")
       )
       Some(stmt.getObject.toString)
     }

@@ -4,7 +4,7 @@ import org.apache.jena.rdf.model.{ Property, Resource, ResourceFactory }
 
 object HyperDiary {
 
-  private val uri = "http://hyperdiary.io/terms/"
+  val uri = "http://hyperdiary.io/terms/"
 
   val Paragraph: Resource = ResourceFactory.createResource(s"${uri}Paragraph")
 

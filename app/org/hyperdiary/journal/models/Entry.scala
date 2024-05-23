@@ -1,5 +1,6 @@
 package org.hyperdiary.journal.models
 
+import org.apache.jena.datatypes.xsd.impl.XMLLiteralType
 import org.apache.jena.rdf.model.{Model, Resource}
 import org.apache.jena.vocabulary.{DCTerms, RDF}
 import org.hyperdiary.journal.vocabulary.HyperDiary
@@ -59,6 +60,11 @@ object Entry {
             paragraph.getProperty(DCTerms.description).getObject
           if (descriptionObject.isLiteral) {
             Paragraph(index, descriptionObject.asLiteral().getString)
+//            if(descriptionObject.asLiteral().getDatatype == XMLLiteralType.theXMLLiteralType){
+//              Paragraph(index, descriptionObject.asLiteral().getString)
+//            } else {
+//              Paragraph(index, descriptionObject.asLiteral().getString)
+//            }
           } else {
             // TODO log incorrect object type
             Paragraph(index, "")

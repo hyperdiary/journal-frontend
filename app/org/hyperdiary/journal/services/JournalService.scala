@@ -10,14 +10,14 @@ import javax.inject.{Inject, Singleton}
 class JournalService @Inject()(solidRepository: SolidRepository) extends BaseService {
   
   def getJournal(journalId: String): Option[JournalHtml] = {
-    val journalUri = s"http://krw.localhost:3000/journal/$journalId"
+    val journalUri = s"$cssPodUri/journal/$journalId"
     solidRepository.getJournal(journalUri).flatMap( journal =>
       Some(JournalHtml(journal.title, getEntryLinks(journal), journal.subtitle))
     )
   }
 
   def getEntry(journalId: String, entryId: String): Option[EntryHtml] = {
-    val entryUri = s"http://krw.localhost:3000/entry/$journalId.$entryId"
+    val entryUri = s"$cssPodUri/entry/$journalId.$entryId"
     solidRepository.getEntry(entryUri).flatMap { entry =>
       Some(EntryHtml(entry.title, getParagraphHtml(entry.paragraphs)))
     }

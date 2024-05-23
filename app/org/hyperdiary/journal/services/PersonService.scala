@@ -12,7 +12,7 @@ import javax.inject.{ Inject, Singleton }
 @Singleton
 class PersonService @Inject() (solidRepository: SolidRepository) extends BaseService {
 
-  private val solidPersonBaseUri = s"$solidBaseUri/person/"
+  private val solidPersonBaseUri = s"$cssPodUri/person"
 
   def getPerson(personId: String): Option[PersonHtml] = {
     val personUri = s"$solidPersonBaseUri/$personId"
@@ -72,7 +72,7 @@ class PersonService @Inject() (solidRepository: SolidRepository) extends BaseSer
       place     <- solidRepository.getPlace(updateUri(residence.locationUri))
     } yield LabelledLink(getResidenceLabel(residence, place), new URI(s"$frontendBaseUri/place/${place.identifier}"))
 
-  def getResidenceLabel(residence: Residence, place: Place): String = {
+  private def getResidenceLabel(residence: Residence, place: Place): String = {
     val placeLabel = place.label
     if (residence.date.nonEmpty) {
       s"$placeLabel (${residence.date})" // FIXME - this is an Option
