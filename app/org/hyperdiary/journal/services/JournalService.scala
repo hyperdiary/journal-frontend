@@ -32,7 +32,7 @@ class JournalService @Inject()(solidRepository: SolidRepository) extends BaseSer
           val rest = token.substring(token.indexOf("]") + 1)
           solidRepository.getLabelLink(label) match {
             case Some(link) =>
-              val patchedLink = updateUri(link) // TODO this is a temporary fix until deployed
+              val patchedLink = updateHtmlLink(link) // TODO this is a temporary fix until deployed
               s"<a href=\"$patchedLink\">$label</a>$rest"
             case _ => s"<span style=\"color:red;\">$label</span>$rest"
           }
