@@ -1,0 +1,7 @@
+@prefix hd:    <http://hyperdiary.io/terms/> .
+@prefix label: <http://waltons.example.org/label/> .
+@prefix dbr:   <http://dbpedia.org/resource/> .
+
+label:water_skiing
+    a             hd:Label ;
+    hd:isLabelFor dbr:Water_skiing .
