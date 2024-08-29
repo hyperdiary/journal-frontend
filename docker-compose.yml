@@ -1,0 +1,22 @@
+name: journal-frontend
+services:
+  solid-journal:
+    container_name: solid_journal
+    ports:
+      - 3000:3000
+    environment:
+      - CSS_CONFIG=/config/css-config.json
+    volumes:
+      - ~/Solid:/data
+      - ~/solid-config:/config
+    image: solidproject/community-server:latest
+#  rdf4j-workbench:
+#    container_name: rdf4j_dbpedia
+#    environment:
+#      - JAVA_OPTS=-Xms1g -Xmx20g
+#    volumes:
+#      - ~/rdf4j:/var/rdf4j
+#      - ~/rdf4j-logs:/usr/local/tomcat/logs"
+#    ports:
+#      - 8080:8080
+#    image: eclipse/rdf4j-workbench:latest

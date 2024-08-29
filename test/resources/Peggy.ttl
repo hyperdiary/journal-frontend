@@ -1,0 +1,10 @@
+@prefix hd:     <http://hyperdiary.io/terms/> .
+@prefix label:  <http://example.hyperdiary.io/label/> .
+@prefix person: <http://example.hyperdiary.io/person/> .
+@prefix dbr:    <http://dbpedia.org/resource/> .
+@prefix wd:     <http://www.wikidata.org/entity/> .
+
+
+label:peggy
+    a             hd:Label ;
+    hd:isLabelFor person:I100194424063 .
