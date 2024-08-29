@@ -4,6 +4,7 @@
 # ~~~~
 
 # An example controller showing a sample home page
+GET     /                               org.hyperdiary.journal.controllers.JournalController.index()
 GET     /journal                        org.hyperdiary.journal.controllers.JournalController.index()
 GET     /journal/:id                    org.hyperdiary.journal.controllers.JournalController.view(id: String)
 GET     /journal/:id/entry/:entryId     org.hyperdiary.journal.controllers.JournalController.viewEntry(id: String, entryId: String)

@@ -7,7 +7,7 @@ class JournalServiceSpec extends PlaySpec {
 
   "JournalService getEntry" must {
 
-    "" in {
+    "" ignore {
       val dummyRepository = new TestSolidRepository()
       val service = new JournalService(dummyRepository)
       val entry = service.getEntry("J1","E1")

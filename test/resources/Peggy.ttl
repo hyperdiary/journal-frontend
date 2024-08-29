@@ -4,6 +4,7 @@
 @prefix dbr:    <http://dbpedia.org/resource/> .
 @prefix wd:     <http://www.wikidata.org/entity/> .
 
-label:water_skiing
+
+label:peggy
     a             hd:Label ;
-    hd:isLabelFor dbr:Water_skiing .
+    hd:isLabelFor person:I100194424063 .
