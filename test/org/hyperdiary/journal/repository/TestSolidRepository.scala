@@ -1,7 +1,7 @@
 package org.hyperdiary.journal.repository
 
 import org.apache.jena.riot.RDFDataMgr
-import org.hyperdiary.journal.models.{Entry, Journal, Person, Place, Residence}
+import org.hyperdiary.journal.models.{ Entry, Journal, Person, Place, Residence }
 
 class TestSolidRepository extends SolidRepository {
 

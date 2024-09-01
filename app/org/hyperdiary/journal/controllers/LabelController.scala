@@ -1,7 +1,7 @@
 package org.hyperdiary.journal.controllers
 
-import org.hyperdiary.journal.services.{LabelService, PersonService}
-import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents, Request}
+import org.hyperdiary.journal.services.{ LabelService, PersonService }
+import play.api.mvc.{ Action, AnyContent, BaseController, ControllerComponents, Request }
 
 import javax.inject.Inject
 
@@ -14,7 +14,7 @@ class LabelController @Inject() (
     Ok(
       org.hyperdiary.journal.views.html.labelMaker()
     )
-    
+
   }
 
 }

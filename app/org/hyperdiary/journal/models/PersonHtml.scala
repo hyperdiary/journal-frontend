@@ -12,7 +12,7 @@ case class PersonHtml(
   surname: String,
   gender: String,
   parents: Parents,
-  birthDate: Option[Either[String,LocalDate]] = None,
+  birthDate: Option[Either[String, LocalDate]] = None,
   birthPlace: Option[LabelledLink] = None,
   deathDate: Option[Either[String, LocalDate]] = None,
   deathPlace: Option[LabelledLink] = None,

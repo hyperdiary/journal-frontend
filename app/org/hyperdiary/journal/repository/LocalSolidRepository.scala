@@ -5,15 +5,15 @@ import com.inrupt.client.jena.JenaBodyHandlers
 import com.inrupt.client.openid.OpenIdSession
 import com.inrupt.client.solid.SolidSyncClient
 import org.apache.jena.query.QueryFactory
-import org.apache.jena.rdf.model.{Model, ModelFactory, RDFNode}
+import org.apache.jena.rdf.model.{ Model, ModelFactory, RDFNode }
 import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder
-import org.hyperdiary.journal.models.{Entry, Journal, Person, Place, Residence}
+import org.hyperdiary.journal.models.{ Entry, Journal, Person, Place, Residence }
 import org.hyperdiary.journal.services.BaseService
 import org.hyperdiary.journal.vocabulary.HyperDiary
 
 import java.io.ByteArrayInputStream
 import java.net.URI
-import javax.inject.{Inject, Singleton}
+import javax.inject.{ Inject, Singleton }
 
 @Singleton
 class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
@@ -47,7 +47,8 @@ class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
       .replaceAll("[,'()]", "")
       .replaceAll("\\.$", "")
       .replace("(", "")
-      .replace(")", "").toLowerCase()
+      .replace(")", "")
+      .toLowerCase()
     val labelUri = s"$cssPodUri/label/$labelLocalName"
     val request = Request.newBuilder().uri(URI.create(labelUri)).GET().build()
     val response = client.send(request, JenaBodyHandlers.ofModel())
@@ -62,7 +63,7 @@ class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
       Some(stmt.getObject.toString)
     }
   }
-  
+
   override def getPerson(personUri: String): Option[Person] = {
     val request = Request.newBuilder().uri(URI.create(personUri)).GET().build()
     val response = client.send(request, JenaBodyHandlers.ofModel())

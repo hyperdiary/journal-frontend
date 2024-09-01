@@ -1,7 +1,7 @@
 package org.hyperdiary.journal.services
 
-import org.apache.jena.riot.{RDFDataMgr, RDFFormat}
-import org.hyperdiary.journal.vocabulary.{DBpedia, PersonalKnowledgeGraph, Wikidata}
+import org.apache.jena.riot.{ RDFDataMgr, RDFFormat }
+import org.hyperdiary.journal.vocabulary.{ DBpedia, PersonalKnowledgeGraph, Wikidata }
 import org.scalatestplus.play.PlaySpec
 
 import java.io.StringWriter
@@ -14,8 +14,8 @@ class LabelServiceSpec extends PlaySpec {
     val service = new LabelService(pkg)
 
     "Create a label to a DBpedia resource" in {
-      val label = service.createLabel("water skiing",s"${DBpedia.resourceBaseUri}Water_skiing")
-      label mustEqual(getModelFromFile("Water_skiing.ttl"))
+      val label = service.createLabel("water skiing", s"${DBpedia.resourceBaseUri}Water_skiing")
+      label mustEqual (getModelFromFile("Water_skiing.ttl"))
     }
 
     "Create a label to a Wikidata resource" in {
@@ -32,8 +32,6 @@ class LabelServiceSpec extends PlaySpec {
       val label = service.createLabel("Peggy", s"${pkg.personBaseUri}I100194424063")
       label mustEqual (getModelFromFile("Peggy.ttl"))
     }
-    
-    
 
   }
 
@@ -41,7 +39,7 @@ class LabelServiceSpec extends PlaySpec {
     val uri = getClass.getResource("/" + path).toURI
     val writer = new StringWriter()
     val expectedModel = RDFDataMgr.loadModel(uri.toString)
-    RDFDataMgr.write(writer,expectedModel,RDFFormat.TURTLE)
+    RDFDataMgr.write(writer, expectedModel, RDFFormat.TURTLE)
     writer.toString
   }
 
