@@ -1,14 +1,16 @@
 package org.hyperdiary.journal.services
 
-import org.apache.jena.rdf.model.{ Model, ModelFactory }
-import org.apache.jena.riot.{ RDFDataMgr, RDFFormat }
+import org.apache.jena.rdf.model.{Model, ModelFactory}
+import org.apache.jena.riot.{RDFDataMgr, RDFFormat}
 import org.apache.jena.vocabulary.RDF
-import org.hyperdiary.journal.vocabulary.{ DBpedia, HyperDiary, PersonalKnowledgeGraph, Wikidata }
+import org.hyperdiary.journal.vocabulary.{DBpedia, HyperDiary, PersonalKnowledgeGraph, Wikidata}
 
 import java.io.StringWriter
+import javax.inject.{Inject, Singleton }
 import scala.jdk.CollectionConverters.*
 
-class LabelService(pkg: PersonalKnowledgeGraph) extends BaseService {
+@Singleton
+class LabelService @Inject(pkg: PersonalKnowledgeGraph) extends BaseService {
 
   def createLabel(label: String, target: String): String = {
     // TODO check if label exists?

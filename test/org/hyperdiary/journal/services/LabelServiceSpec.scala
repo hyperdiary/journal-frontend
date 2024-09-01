@@ -28,6 +28,13 @@ class LabelServiceSpec extends PlaySpec {
       label mustEqual (getModelFromFile("Peggy.ttl"))
     }
 
+    "Create two labels to a Personal Knowledge Graph resource" in {
+      val label = service.createLabel("Peggy", s"${pkg.personBaseUri}I100194424063")
+      label mustEqual (getModelFromFile("Peggy.ttl"))
+    }
+    
+    
+
   }
 
   private def getModelFromFile(path: String) = {
