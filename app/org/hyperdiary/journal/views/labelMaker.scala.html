@@ -1,33 +1,38 @@
+@import helper._
+@import org.hyperdiary.journal.forms.LabelData
+
+@(labelForm: Form[LabelData])
+
 @main("Welcome to Play") {
-<header class="w3-container w3-teal">
-    <h1>Label Maker</h1>
-</header>
-<article class="w3-container w3-monospace">
-    <div class="w3-row">
-        <div class="w3-col m8 l9">
-            <h2>Label Maker</h2>
-            <form action="/action_page.php">
-                <div class="w3-padding">
-                    <label for="label">Label text:</label>
-                    <input type="text" id="label" name="label" />
-                </div>
-                <div class="w3-padding">
-                    <label for="kg">Knowledge Graph:</label>
-                    <select id="kg" name="base">
-                        <option value="dbpedia">DBPedia</option>
-                        <option value="wikidata">Wikidata</option>
-                        <option value="hyperdiary">HyperDiary</option>
-                    </select>
-                </div>
-                <div class="w3-padding">
-                    <label for="resource">Resource name:</label>
-                    <input type="text" id="resource" name="resource" />
-                </div>
-                <button type="button" class="w3-btn w3-teal" onclick="alert('Hello World!')">Add and make another</button>
-                <button type="button" class="w3-btn w3-teal" onclick="alert('Hello World!')">Add and finish</button>
-            </form>
+    <header class="w3-container w3-teal">
+        <h1>Label Maker</h1>
+    </header>
+    <article class="w3-container w3-monospace">
+        <div class="w3-row">
+            <div class="w3-col m8 l9">
+                <h2>Label Maker</h2>
+                @form(action = org.hyperdiary.journal.controllers.routes.LabelController.submit()) {
+                    <div class="w3-padding">
+                        <label for="label">Label text:</label>
+                        <input type="text" id="label" name="label" />
+                    </div>
+                    <div class="w3-padding">
+                        <label for="kg">Knowledge Graph:</label>
+                        <select id="kg" name="graph">
+                            <option value="dbpedia">DBPedia</option>
+                            <option value="wikidata">Wikidata</option>
+                            <option value="hyperdiary">HyperDiary</option>
+                        </select>
+                    </div>
+                    <div class="w3-padding">
+                        <label for="resource">Resource name:</label>
+                        <input type="text" id="resource" name="resource" />
+                    </div>
+                    <button name="action" value="add" class="w3-btn w3-teal">Add and make another</button>
+                    <button name="action" value="finish" class="w3-btn w3-teal">Add and finish</button>
+                }
+            </div>
         </div>
-    </div>
-</article>
-<footer class="w3-container w3-teal"></footer>
+    </article>
+    <footer class="w3-container w3-teal"></footer>
 }
