@@ -1,7 +1,18 @@
 @import helper._
 @import org.hyperdiary.journal.forms.LabelData
 
-@(labelForm: Form[LabelData])
+@(labelForm: Form[LabelData])(implicit request: MessagesRequestHeader)
+
+@labelledTextInput(name: String, label:String) = {
+    <div class="w3-padding">
+        <label for="@name">@label:</label>
+        <input type="text" id="@name" name="@name" />
+    </div>
+}
+
+@button(value: String, label: String) = {
+    <button name="action" value="@value" class="w3-btn w3-teal">@label</button>
+}
 
 @main("Welcome to Play") {
     <header class="w3-container w3-teal">
@@ -10,26 +21,20 @@
     <article class="w3-container w3-monospace">
         <div class="w3-row">
             <div class="w3-col m8 l9">
-                <h2>Label Maker</h2>
                 @form(action = org.hyperdiary.journal.controllers.routes.LabelController.submit()) {
+                @CSRF.formField
+                    @labelledTextInput(name = "label-text", label = "Label text")
                     <div class="w3-padding">
-                        <label for="label">Label text:</label>
-                        <input type="text" id="label" name="label" />
-                    </div>
-                    <div class="w3-padding">
-                        <label for="kg">Knowledge Graph:</label>
-                        <select id="kg" name="graph">
+                        <label for="target-graph">Target Graph:</label>
+                        <select id="target-graph" name="target-graph">
                             <option value="dbpedia">DBPedia</option>
                             <option value="wikidata">Wikidata</option>
                             <option value="hyperdiary">HyperDiary</option>
                         </select>
                     </div>
-                    <div class="w3-padding">
-                        <label for="resource">Resource name:</label>
-                        <input type="text" id="resource" name="resource" />
-                    </div>
-                    <button name="action" value="add" class="w3-btn w3-teal">Add and make another</button>
-                    <button name="action" value="finish" class="w3-btn w3-teal">Add and finish</button>
+                    @labelledTextInput(name = "target-name", label = "Target name")
+                    @button(value = "add", label = "Add and make another")
+                    @button(value = "finish", label = "Add and finish")
                 }
             </div>
         </div>
