@@ -1,19 +1,18 @@
 package org.hyperdiary.journal.repository
-import com.inrupt.client.Request
+import com.inrupt.client.{ Request, Response }
 import com.inrupt.client.auth.Session
-import com.inrupt.client.jena.JenaBodyHandlers
+import com.inrupt.client.jena.{ JenaBodyHandlers, JenaBodyPublishers }
 import com.inrupt.client.openid.OpenIdSession
 import com.inrupt.client.solid.SolidSyncClient
-import org.apache.jena.query.QueryFactory
 import org.apache.jena.rdf.model.{ Model, ModelFactory, RDFNode }
-import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder
-import org.hyperdiary.journal.models.{ Entry, Journal, Person, Place, Residence }
+import org.hyperdiary.journal.models.*
 import org.hyperdiary.journal.services.BaseService
 import org.hyperdiary.journal.vocabulary.HyperDiary
 
-import java.io.ByteArrayInputStream
 import java.net.URI
+import java.net.http.HttpRequest.BodyPublisher
 import javax.inject.{ Inject, Singleton }
+import scala.jdk.CollectionConverters.*
 
 @Singleton
 class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
@@ -80,5 +79,25 @@ class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
     val request = Request.newBuilder().uri(URI.create(placeUri)).GET().build()
     val response = client.send(request, JenaBodyHandlers.ofModel())
     Place.fromModel(response.body())
+  }
+
+  override def createLabels(labelsModel: Model): Unit =
+    labelsModel.listSubjects().toList.asScala.foreach { labelResource =>
+      val labelModel = labelResource.listProperties().toModel
+      val labelUri = labelResource.getURI
+      createLabel(labelUri, labelModel)
+    }
+
+  private def createLabel(labelUri: String, labelModel: Model): Response[Void] = {
+    val request = Request
+      .newBuilder()
+      .uri(URI.create(labelUri))
+      .header("Content-Type", "text/turtle")
+      .POST(JenaBodyPublishers.ofModel(labelModel))
+      .build()
+    val response = client.send(request, Response.BodyHandlers.discarding())
+    // TODO(RW) - we need to check the request was successful
+    // response.statusCode()
+    response
   }
 }

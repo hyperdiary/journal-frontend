@@ -2,19 +2,21 @@ package org.hyperdiary.journal.controllers
 
 import org.hyperdiary.journal.services.{ LabelService, PersonService }
 import play.api.mvc.{ Action, AnyContent, BaseController, ControllerComponents, MessagesActionBuilder, MessagesRequest, Request }
-import org.hyperdiary.journal.forms.LabelDataFormProvider
+import org.hyperdiary.journal.forms.{ KnowledgeGraph, LabelDataFormProvider }
+import org.hyperdiary.journal.vocabulary.{ DBpedia, PersonalKnowledgeGraph, Wikidata }
 
 import javax.inject.Inject
 
 class LabelController @Inject() (
   messagesAction: MessagesActionBuilder,
   val controllerComponents: ControllerComponents,
-  labelService: LabelService
+  labelService: LabelService,
+  pkg: PersonalKnowledgeGraph
 ) extends BaseController {
 
   def view(): Action[AnyContent] = messagesAction { implicit request: MessagesRequest[AnyContent] =>
     Ok(
-      org.hyperdiary.journal.views.html.labelMaker(LabelDataFormProvider())
+      org.hyperdiary.journal.views.html.labelMaker(LabelDataFormProvider(), getKnowledgeGraphs)
     )
 
   }
@@ -25,15 +27,24 @@ class LabelController @Inject() (
         LabelDataFormProvider()
           .bindFromRequest()
           .fold(
-            formWithErrors => BadRequest(org.hyperdiary.journal.views.html.labelMaker(formWithErrors)),
+            formWithErrors =>
+              BadRequest(org.hyperdiary.journal.views.html.labelMaker(formWithErrors, getKnowledgeGraphs)),
             labelData => {
-              labelService.createLabel(labelData.labelText, s"${labelData.targetGraph}/${labelData.targetName}")
-              Ok(org.hyperdiary.journal.views.html.labelMaker(LabelDataFormProvider()))
+              labelService.createLabel(labelData.labelText, s"${labelData.targetGraph}${labelData.targetName}")
+              Ok(org.hyperdiary.journal.views.html.labelMaker(LabelDataFormProvider(), getKnowledgeGraphs))
             }
           )
-      case Some("finish") => Ok(org.hyperdiary.journal.views.html.labelMaker(LabelDataFormProvider()))
-      case _              => Ok(org.hyperdiary.journal.views.html.labelMaker(LabelDataFormProvider()))
+      case Some("finish") =>
+        Ok(org.hyperdiary.journal.views.html.labelMaker(LabelDataFormProvider(), getKnowledgeGraphs))
+      case _ => Ok(org.hyperdiary.journal.views.html.labelMaker(LabelDataFormProvider(), getKnowledgeGraphs))
     }
   }
+
+  private def getKnowledgeGraphs: Seq[KnowledgeGraph] =
+    List(
+      KnowledgeGraph(DBpedia.resourceBaseUri, "DBpedia"),
+      KnowledgeGraph(Wikidata.entityBaseUri, "Wikidata"),
+      KnowledgeGraph(pkg.personBaseUri, "Hyperdiary person")
+    )
 
 }

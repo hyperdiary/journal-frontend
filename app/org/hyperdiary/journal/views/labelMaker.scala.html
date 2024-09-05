@@ -1,12 +1,15 @@
 @import helper._
-@import org.hyperdiary.journal.forms.LabelData
+@import org.hyperdiary.journal.forms.{LabelData, KnowledgeGraph}
 
-@(labelForm: Form[LabelData])(implicit request: MessagesRequestHeader)
+@(labelForm: Form[LabelData], knowledgeGraphs: Seq[KnowledgeGraph])(implicit request: MessagesRequestHeader)
 
 @labelledTextInput(name: String, label:String) = {
     <div class="w3-padding">
         <label for="@name">@label:</label>
-        <input type="text" id="@name" name="@name" />
+        <input type="text" id="@name" name="@name"/>
+        @labelForm.error(name).map { error =>
+            <span style="color:red;">@error.format</span>
+        }
     </div>
 }
 
@@ -24,12 +27,13 @@
                 @form(action = org.hyperdiary.journal.controllers.routes.LabelController.submit()) {
                 @CSRF.formField
                     @labelledTextInput(name = "label-text", label = "Label text")
+
                     <div class="w3-padding">
                         <label for="target-graph">Target Graph:</label>
                         <select id="target-graph" name="target-graph">
-                            <option value="dbpedia">DBPedia</option>
-                            <option value="wikidata">Wikidata</option>
-                            <option value="hyperdiary">HyperDiary</option>
+                        @for(graph <- knowledgeGraphs) {
+                            <option value="@graph.uri">@graph.label</option>
+                        }
                         </select>
                     </div>
                     @labelledTextInput(name = "target-name", label = "Target name")

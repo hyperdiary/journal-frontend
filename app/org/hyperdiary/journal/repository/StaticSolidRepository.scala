@@ -1,4 +1,5 @@
 package org.hyperdiary.journal.repository
+import org.apache.jena.rdf.model.Model
 import org.hyperdiary.journal.models.{ Entry, Journal, Paragraph, Person, Place, Residence }
 
 import javax.inject.{ Inject, Singleton }
@@ -50,4 +51,7 @@ class StaticSolidRepository @Inject() extends SolidRepository {
   override def getResidence(residenceUri: String): Option[Residence] = ???
 
   override def getPlace(placeUri: String): Option[Place] = ???
+
+  override def createLabels(labelsModel: Model): Unit = ???
+
 }
