@@ -19,6 +19,6 @@ trait SolidRepository {
 
   def getPlace(placeUri: String): Option[Place]
 
-  def createLabels(labelsModel: Model): Unit
+  def createLabel(labelsModel: Model): Option[String]
 
 }

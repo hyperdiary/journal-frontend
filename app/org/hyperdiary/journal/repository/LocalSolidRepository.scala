@@ -81,14 +81,10 @@ class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
     Place.fromModel(response.body())
   }
 
-  override def createLabels(labelsModel: Model): Unit =
-    labelsModel.listSubjects().toList.asScala.foreach { labelResource =>
-      val labelModel = labelResource.listProperties().toModel
-      val labelUri = labelResource.getURI
-      createLabel(labelUri, labelModel)
-    }
-
-  private def createLabel(labelUri: String, labelModel: Model): Response[Void] = {
+  override def createLabel(labelsModel: Model): Option[String] = {
+    val labelResource = labelsModel.listSubjects().toList.asScala.head
+    val labelModel = labelResource.listProperties().toModel
+    val labelUri = labelResource.getURI
     val request = Request
       .newBuilder()
       .uri(URI.create(labelUri))
@@ -96,8 +92,11 @@ class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
       .POST(JenaBodyPublishers.ofModel(labelModel))
       .build()
     val response = client.send(request, Response.BodyHandlers.discarding())
-    // TODO(RW) - we need to check the request was successful
-    // response.statusCode()
-    response
+    if(response.statusCode() == 200) {
+      Some(labelUri)
+    } else {
+      // TODO(RW) log error
+      None
+    }
   }
 }

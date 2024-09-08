@@ -52,6 +52,6 @@ class StaticSolidRepository @Inject() extends SolidRepository {
 
   override def getPlace(placeUri: String): Option[Place] = ???
 
-  override def createLabels(labelsModel: Model): Unit = ???
+  override def createLabel(labelsModel: Model): Option[String] = ???
 
 }

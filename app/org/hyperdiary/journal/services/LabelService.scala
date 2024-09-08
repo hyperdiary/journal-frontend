@@ -13,18 +13,25 @@ import scala.jdk.CollectionConverters.*
 @Singleton
 class LabelService @Inject (solidRepository: SolidRepository, pkg: PersonalKnowledgeGraph) extends BaseService {
 
-  def createLabel(label: String, target: String): String = {
+  def createLabel(label: String, target: String): Option[String] = {
     // TODO check if label exists?
+    val labelModel = createLabelModel(label,target)
+    val result = solidRepository.createLabel(labelModel)
+    labelModel.close()
+    result
+//    val writer = new StringWriter()
+//    RDFDataMgr.write(writer, labelModel, RDFFormat.TURTLE)
+//    labelModel.close()
+  }
+  
+  def createLabelModel(label: String, target: String): Model = {
     val model = getModel
     val labelResource = model.createResource(s"${pkg.labelBaseUri}${sanitise(label)}")
     val targetResource = model.createResource(target)
     labelResource.addProperty(RDF.`type`, HyperDiary.Label)
     labelResource.addProperty(HyperDiary.isLabelFor, targetResource)
-    solidRepository.createLabels(model)
-    val writer = new StringWriter()
-    RDFDataMgr.write(writer, model, RDFFormat.TURTLE)
-    model.close()
-    writer.toString
+    // TODO(RW) check for exceptions?
+    model
   }
 
   private def getModel: Model = {
