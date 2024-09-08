@@ -3,6 +3,7 @@ import org.apache.jena.rdf.model.Model
 import org.hyperdiary.journal.models.{ Entry, Journal, Paragraph, Person, Place, Residence }
 
 import javax.inject.{ Inject, Singleton }
+import scala.util.Try
 
 @Singleton
 class StaticSolidRepository @Inject() extends SolidRepository {
@@ -52,6 +53,6 @@ class StaticSolidRepository @Inject() extends SolidRepository {
 
   override def getPlace(placeUri: String): Option[Place] = ???
 
-  override def createLabel(labelsModel: Model): Option[String] = ???
+  override def createLabel(labelsModel: Model): Try[String] = ???
 
 }

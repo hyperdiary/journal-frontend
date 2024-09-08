@@ -9,28 +9,24 @@ import org.hyperdiary.journal.vocabulary.{ DBpedia, HyperDiary, PersonalKnowledg
 import java.io.StringWriter
 import javax.inject.{ Inject, Singleton }
 import scala.jdk.CollectionConverters.*
+import scala.util.Try
 
 @Singleton
 class LabelService @Inject (solidRepository: SolidRepository, pkg: PersonalKnowledgeGraph) extends BaseService {
 
-  def createLabel(label: String, target: String): Option[String] = {
+  def createLabel(label: String, target: String): Try[String] =
     // TODO check if label exists?
-    val labelModel = createLabelModel(label,target)
-    val result = solidRepository.createLabel(labelModel)
-    labelModel.close()
-    result
-//    val writer = new StringWriter()
-//    RDFDataMgr.write(writer, labelModel, RDFFormat.TURTLE)
-//    labelModel.close()
-  }
-  
-  def createLabelModel(label: String, target: String): Model = {
+    for {
+      labelModel <- createLabelModel(label, target)
+      result     <- solidRepository.createLabel(labelModel)
+      _          <- Try(labelModel.close())
+    } yield result
+
+  def createLabelModel(label: String, target: String): Try[Model] = Try {
     val model = getModel
     val labelResource = model.createResource(s"${pkg.labelBaseUri}${sanitise(label)}")
     val targetResource = model.createResource(target)
-    labelResource.addProperty(RDF.`type`, HyperDiary.Label)
-    labelResource.addProperty(HyperDiary.isLabelFor, targetResource)
-    // TODO(RW) check for exceptions?
+    labelResource.addProperty(RDF.`type`, HyperDiary.Label).addProperty(HyperDiary.isLabelFor, targetResource)
     model
   }
 

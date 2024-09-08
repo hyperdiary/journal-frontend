@@ -13,6 +13,7 @@ import java.net.URI
 import java.net.http.HttpRequest.BodyPublisher
 import javax.inject.{ Inject, Singleton }
 import scala.jdk.CollectionConverters.*
+import scala.util.{ Success, Try }
 
 @Singleton
 class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
@@ -81,7 +82,7 @@ class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
     Place.fromModel(response.body())
   }
 
-  override def createLabel(labelsModel: Model): Option[String] = {
+  override def createLabel(labelsModel: Model): Try[String] = Try {
     val labelResource = labelsModel.listSubjects().toList.asScala.head
     val labelModel = labelResource.listProperties().toModel
     val labelUri = labelResource.getURI
@@ -89,14 +90,13 @@ class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
       .newBuilder()
       .uri(URI.create(labelUri))
       .header("Content-Type", "text/turtle")
-      .POST(JenaBodyPublishers.ofModel(labelModel))
+      .PUT(JenaBodyPublishers.ofModel(labelModel))
       .build()
     val response = client.send(request, Response.BodyHandlers.discarding())
-    if(response.statusCode() == 200) {
-      Some(labelUri)
+    if (response.statusCode() == 201) {
+      labelUri
     } else {
-      // TODO(RW) log error
-      None
+      throw new RuntimeException("oops!") // TODO(RW) improve this!
     }
   }
 }

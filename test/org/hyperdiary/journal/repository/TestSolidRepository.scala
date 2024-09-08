@@ -4,6 +4,8 @@ import org.apache.jena.rdf.model.Model
 import org.apache.jena.riot.RDFDataMgr
 import org.hyperdiary.journal.models.{Entry, Journal, Person, Place, Residence}
 
+import scala.util.Try
+
 class TestSolidRepository extends SolidRepository {
 
   override def getEntry(entryUri: String): Option[Entry] = {
@@ -22,5 +24,5 @@ class TestSolidRepository extends SolidRepository {
 
   override def getResidence(residenceUri: String): Option[Residence] = ???
 
-  override def createLabel(labelsModel: Model): Option[String] = ???
+  override def createLabel(labelsModel: Model): Try[String] = ???
 }

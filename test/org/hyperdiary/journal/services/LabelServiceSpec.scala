@@ -14,10 +14,9 @@ class LabelServiceSpec extends PlaySpec with MockitoSugar {
 
   "LabelService getLabel" must {
 
-    val mockConfig = mock[Config]
-    when(mockConfig).
+    val testConfig = Config("example")
     val mockSolidRepository = mock[SolidRepository]
-    val pkg = PersonalKnowledgeGraph(mockConfig)
+    val pkg = PersonalKnowledgeGraph(testConfig)
     val service = new LabelService(mockSolidRepository,pkg)
 
     "Create a label to a DBpedia resource" in {

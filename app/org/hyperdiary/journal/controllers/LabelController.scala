@@ -6,6 +6,7 @@ import org.hyperdiary.journal.forms.{ KnowledgeGraph, LabelDataFormProvider }
 import org.hyperdiary.journal.vocabulary.{ DBpedia, PersonalKnowledgeGraph, Wikidata }
 
 import javax.inject.Inject
+import scala.util.{ Failure, Success }
 
 class LabelController @Inject() (
   messagesAction: MessagesActionBuilder,
@@ -29,10 +30,13 @@ class LabelController @Inject() (
           .fold(
             formWithErrors =>
               BadRequest(org.hyperdiary.journal.views.html.labelMaker(formWithErrors, getKnowledgeGraphs)),
-            labelData => {
-              labelService.createLabel(labelData.labelText, s"${labelData.targetGraph}${labelData.targetName}")
-              Ok(org.hyperdiary.journal.views.html.labelMaker(LabelDataFormProvider(), getKnowledgeGraphs))
-            }
+            labelData =>
+              labelService.createLabel(labelData.labelText, s"${labelData.targetGraph}${labelData.targetName}") match {
+                case Success(result) =>
+                  Ok(org.hyperdiary.journal.views.html.labelMaker(LabelDataFormProvider(), getKnowledgeGraphs))
+                case Failure(e) =>
+                  BadRequest(org.hyperdiary.journal.views.html.labelMaker(LabelDataFormProvider(), getKnowledgeGraphs))
+              }
           )
       case Some("finish") =>
         Ok(org.hyperdiary.journal.views.html.labelMaker(LabelDataFormProvider(), getKnowledgeGraphs))

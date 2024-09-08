@@ -4,6 +4,8 @@ import com.google.inject.ImplementedBy
 import org.apache.jena.rdf.model.Model
 import org.hyperdiary.journal.models.{ Entry, Journal, Person, Place, Residence }
 
+import scala.util.Try
+
 @ImplementedBy(classOf[LocalSolidRepository])
 trait SolidRepository {
 
@@ -19,6 +21,6 @@ trait SolidRepository {
 
   def getPlace(placeUri: String): Option[Place]
 
-  def createLabel(labelsModel: Model): Option[String]
+  def createLabel(labelsModel: Model): Try[String]
 
 }
