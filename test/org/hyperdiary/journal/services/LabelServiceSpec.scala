@@ -1,9 +1,9 @@
 package org.hyperdiary.journal.services
 
-import org.apache.jena.riot.{RDFDataMgr, RDFFormat}
+import org.apache.jena.riot.{ RDFDataMgr, RDFFormat }
 import org.hyperdiary.journal.config.Config
 import org.hyperdiary.journal.repository.SolidRepository
-import org.hyperdiary.journal.vocabulary.{DBpedia, PersonalKnowledgeGraph, Wikidata}
+import org.hyperdiary.journal.vocabulary.{ DBpedia, PersonalKnowledgeGraph, Wikidata }
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -17,7 +17,7 @@ class LabelServiceSpec extends PlaySpec with MockitoSugar {
     val testConfig = Config("example")
     val mockSolidRepository = mock[SolidRepository]
     val pkg = PersonalKnowledgeGraph(testConfig)
-    val service = new LabelService(mockSolidRepository,pkg)
+    val service = new LabelService(mockSolidRepository, pkg)
 
     "Create a label to a DBpedia resource" in {
       val label = service.createLabel("water skiing", s"${DBpedia.resourceBaseUri}Water_skiing")

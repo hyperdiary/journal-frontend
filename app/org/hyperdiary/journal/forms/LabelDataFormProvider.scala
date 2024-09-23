@@ -8,10 +8,16 @@ object LabelDataFormProvider {
 
   def apply(): Form[LabelData] = Form(
     mapping(
-      "label-text"   -> text.verifying(nonEmpty),
-      "target-graph" -> text,
-      "target-name"  -> text.verifying(nonEmpty)
+      FieldNames.labelText   -> text.verifying(nonEmpty),
+      FieldNames.targetGraph -> text,
+      FieldNames.targetName  -> text.verifying(nonEmpty)
     )(LabelData.apply)(LabelData.unapply)
   )
+
+  object FieldNames {
+    val labelText = "label-text"
+    val targetGraph = "target-graph"
+    val targetName = "target-name"
+  }
 
 }

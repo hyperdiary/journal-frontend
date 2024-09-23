@@ -13,7 +13,7 @@ import java.net.URI
 import java.net.http.HttpRequest.BodyPublisher
 import javax.inject.{ Inject, Singleton }
 import scala.jdk.CollectionConverters.*
-import scala.util.{ Success, Try }
+import scala.util.{ Failure, Success, Try }
 
 @Singleton
 class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
@@ -51,16 +51,21 @@ class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
       .toLowerCase()
     val labelUri = s"$cssPodUri/label/$labelLocalName"
     val request = Request.newBuilder().uri(URI.create(labelUri)).GET().build()
-    val response = client.send(request, JenaBodyHandlers.ofModel())
-    if (response.body().isEmpty) {
-      None
-    } else {
-      val model = response.body()
-      val stmt = model.getProperty(
-        model.createResource(s"$podBaseUri/label/$labelLocalName"),
-        model.createProperty(HyperDiary.uri, "isLabelFor")
-      )
-      Some(stmt.getObject.toString)
+    Try(client.send(request, JenaBodyHandlers.ofModel())) match {
+      case Success(response) =>
+        if (response.body().isEmpty) {
+          None
+        } else {
+          val model = response.body()
+          val stmt = model.getProperty(
+            model.createResource(s"$podBaseUri/label/$labelLocalName"),
+            model.createProperty(HyperDiary.uri, "isLabelFor")
+          )
+          Some(stmt.getObject.toString)
+        }
+      case Failure(e) =>
+        // TODO log error
+        None
     }
   }
 

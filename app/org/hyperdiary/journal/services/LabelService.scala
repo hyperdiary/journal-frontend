@@ -1,26 +1,28 @@
 package org.hyperdiary.journal.services
 
 import org.apache.jena.rdf.model.{ Model, ModelFactory }
-import org.apache.jena.riot.{ RDFDataMgr, RDFFormat }
 import org.apache.jena.vocabulary.RDF
+import org.hyperdiary.journal.LabelAlreadyExists
 import org.hyperdiary.journal.repository.SolidRepository
 import org.hyperdiary.journal.vocabulary.{ DBpedia, HyperDiary, PersonalKnowledgeGraph, Wikidata }
 
-import java.io.StringWriter
 import javax.inject.{ Inject, Singleton }
 import scala.jdk.CollectionConverters.*
-import scala.util.Try
+import scala.util.{ Failure, Try }
 
 @Singleton
 class LabelService @Inject (solidRepository: SolidRepository, pkg: PersonalKnowledgeGraph) extends BaseService {
 
   def createLabel(label: String, target: String): Try[String] =
-    // TODO check if label exists?
-    for {
-      labelModel <- createLabelModel(label, target)
-      result     <- solidRepository.createLabel(labelModel)
-      _          <- Try(labelModel.close())
-    } yield result
+    solidRepository.getLabelLink(label) match {
+      case None =>
+        for {
+          labelModel <- createLabelModel(label, target)
+          result     <- solidRepository.createLabel(labelModel)
+          _          <- Try(labelModel.close())
+        } yield result
+      case Some(_) => Failure(LabelAlreadyExists())
+    }
 
   def createLabelModel(label: String, target: String): Try[Model] = Try {
     val model = getModel

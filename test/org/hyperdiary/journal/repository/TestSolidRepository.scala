@@ -2,7 +2,7 @@ package org.hyperdiary.journal.repository
 
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.riot.RDFDataMgr
-import org.hyperdiary.journal.models.{Entry, Journal, Person, Place, Residence}
+import org.hyperdiary.journal.models.{ Entry, Journal, Person, Place, Residence }
 
 import scala.util.Try
 
