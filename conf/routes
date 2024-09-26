@@ -10,8 +10,12 @@ GET     /journal/:id                    org.hyperdiary.journal.controllers.Journ
 GET     /journal/:id/entry/:entryId     org.hyperdiary.journal.controllers.JournalController.viewEntry(id: String, entryId: String)
 GET     /person/:id                     org.hyperdiary.journal.controllers.PersonController.view(id: String)
 GET     /place/:id                      org.hyperdiary.journal.controllers.PlaceController.view(id: String)
-GET     /label-maker                    org.hyperdiary.journal.controllers.LabelController.view()
-POST    /label-maker                    org.hyperdiary.journal.controllers.LabelController.submit()
+GET     /label                          org.hyperdiary.journal.controllers.LabelController.home()
+POST    /label                          org.hyperdiary.journal.controllers.LabelController.navigate()
+GET     /label/create                   org.hyperdiary.journal.controllers.LabelController.create()
+POST    /label/create                   org.hyperdiary.journal.controllers.LabelController.submit()
+GET     /label/delete                   org.hyperdiary.journal.controllers.LabelController.delete()
+POST    /label/delete                   org.hyperdiary.journal.controllers.LabelController.deleteLabel()
                                                                                    
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

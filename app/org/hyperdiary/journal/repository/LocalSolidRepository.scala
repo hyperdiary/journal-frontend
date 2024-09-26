@@ -7,7 +7,7 @@ import com.inrupt.client.solid.SolidSyncClient
 import org.apache.jena.rdf.model.{ Model, ModelFactory, RDFNode }
 import org.hyperdiary.journal.models.*
 import org.hyperdiary.journal.services.BaseService
-import org.hyperdiary.journal.vocabulary.HyperDiary
+import org.hyperdiary.journal.vocabulary.{ HyperDiary, PersonalKnowledgeGraph }
 
 import java.net.URI
 import java.net.http.HttpRequest.BodyPublisher
@@ -16,7 +16,7 @@ import scala.jdk.CollectionConverters.*
 import scala.util.{ Failure, Success, Try }
 
 @Singleton
-class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
+class LocalSolidRepository @Inject (pkg: PersonalKnowledgeGraph) extends SolidRepository with BaseService {
 
   private val session: Session = OpenIdSession.ofClientCredentials(
     new URI("http://localhost:3000/"),
@@ -49,7 +49,7 @@ class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
       .replace("(", "")
       .replace(")", "")
       .toLowerCase()
-    val labelUri = s"$cssPodUri/label/$labelLocalName"
+    val labelUri = s"${pkg.labelBaseUri}$labelLocalName"
     val request = Request.newBuilder().uri(URI.create(labelUri)).GET().build()
     Try(client.send(request, JenaBodyHandlers.ofModel())) match {
       case Success(response) =>
@@ -103,5 +103,9 @@ class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
     } else {
       throw new RuntimeException("oops!") // TODO(RW) improve this!
     }
+  }
+
+  override def deleteLabel(labelUri: String): Try[Unit] = Try {
+    client.delete(new URI(labelUri))
   }
 }

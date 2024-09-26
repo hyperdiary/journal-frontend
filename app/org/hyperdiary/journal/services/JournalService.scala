@@ -2,22 +2,23 @@ package org.hyperdiary.journal.services
 
 import org.hyperdiary.journal.models.{ EntryHtml, EntryLink, Journal, JournalHtml, Paragraph }
 import org.hyperdiary.journal.repository.SolidRepository
+import org.hyperdiary.journal.vocabulary.PersonalKnowledgeGraph
 import play.twirl.api.Html
 
 import javax.inject.{ Inject, Singleton }
 
 @Singleton
-class JournalService @Inject() (solidRepository: SolidRepository) extends BaseService {
+class JournalService @Inject (pkg: PersonalKnowledgeGraph)(solidRepository: SolidRepository) extends BaseService {
 
   def getJournal(journalId: String): Option[JournalHtml] = {
-    val journalUri = s"$cssPodUri/journal/$journalId"
+    val journalUri = s"${pkg.journalBaseUri}$journalId"
     solidRepository
       .getJournal(journalUri)
       .flatMap(journal => Some(JournalHtml(journal.title, getEntryLinks(journal), journal.subtitle)))
   }
 
   def getEntry(journalId: String, entryId: String): Option[EntryHtml] = {
-    val entryUri = s"$cssPodUri/entry/$journalId.$entryId"
+    val entryUri = s"${pkg.entryBaseUri}$journalId.$entryId"
     solidRepository.getEntry(entryUri).flatMap { entry =>
       Some(EntryHtml(entry.title, getParagraphHtml(entry.paragraphs)))
     }
@@ -32,7 +33,7 @@ class JournalService @Inject() (solidRepository: SolidRepository) extends BaseSe
           val rest = token.substring(token.indexOf("]") + 1)
           solidRepository.getLabelLink(label) match {
             case Some(link) =>
-              val patchedLink = updateHtmlLink(link) // TODO this is a temporary fix until deployed
+              val patchedLink = updateHtmlLink(link, pkg.baseUri) // TODO this is a temporary fix until deployed
               s"<a href=\"$patchedLink\">$label</a>$rest"
             case _ => s"<span style=\"color:red;\">$label</span>$rest"
           }
@@ -45,7 +46,7 @@ class JournalService @Inject() (solidRepository: SolidRepository) extends BaseSe
 
   private def getEntryLinks(journal: Journal): List[EntryLink] =
     journal.entries.flatMap { entryUri =>
-      solidRepository.getEntry(updateUri(entryUri)).flatMap { entry =>
+      solidRepository.getEntry(updateUri(entryUri, pkg.baseUri)).flatMap { entry =>
         Some(EntryLink(entry.id, getJournalLink(journal.id, entry.id), entry.title))
       }
     }.sorted

@@ -55,4 +55,5 @@ class StaticSolidRepository @Inject() extends SolidRepository {
 
   override def createLabel(labelsModel: Model): Try[String] = ???
 
+  override def deleteLabel(labelUri: String): Try[Unit] = ???
 }

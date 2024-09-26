@@ -24,7 +24,10 @@ class LabelService @Inject (solidRepository: SolidRepository, pkg: PersonalKnowl
       case Some(_) => Failure(LabelAlreadyExists())
     }
 
-  def createLabelModel(label: String, target: String): Try[Model] = Try {
+  def deleteLabel(labelName: String): Try[Unit] =
+    solidRepository.deleteLabel(s"${pkg.labelBaseUri}$labelName")
+
+  private def createLabelModel(label: String, target: String): Try[Model] = Try {
     val model = getModel
     val labelResource = model.createResource(s"${pkg.labelBaseUri}${sanitise(label)}")
     val targetResource = model.createResource(target)

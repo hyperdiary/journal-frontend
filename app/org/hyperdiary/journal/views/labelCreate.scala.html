@@ -2,12 +2,16 @@
 @import org.hyperdiary.journal.forms.{LabelData, KnowledgeGraph}
 @import org.hyperdiary.journal.forms.LabelDataFormProvider.FieldNames
 
-@(labelForm: Form[LabelData], knowledgeGraphs: Seq[KnowledgeGraph])(implicit request: MessagesRequestHeader)
+@(labelForm: Form[LabelData], knowledgeGraphs: Seq[KnowledgeGraph], createdLabel: Option[String] = None)(implicit request: MessagesRequestHeader)
 
-@labelledTextInput(name: String, label:String, value: String) = {
+@labelledTextInput(name: String, label:String, value: Option[String]) = {
     <div class="w3-padding">
         <label for="@name">@label:</label>
-        <input type="text" id="@name" name="@name" value="@value"/>
+        @if(value.nonEmpty){
+            <input type="text" name="@name" id="@name" value="@value.get"/>
+        } else {
+            <input type="text" name="@name" id="@name" value=""/>
+        }
         @labelForm.error(name).map { error =>
             <span style="color:red;">@error.format</span>
         }
@@ -18,16 +22,17 @@
     <button name="action" value="@value" class="w3-btn w3-teal">@label</button>
 }
 
-@main("Welcome to Play") {
+@main("Create a Label") {
     <header class="w3-container w3-teal">
-        <h1>Label Maker</h1>
+        <h1>Create a Label</h1>
     </header>
     <article class="w3-container w3-monospace">
         <div class="w3-row">
             <div class="w3-col m8 l9">
+                <div class="w3-padding">
                 @form(action = org.hyperdiary.journal.controllers.routes.LabelController.submit()) {
-                @CSRF.formField
-                    @labelledTextInput(name = FieldNames.labelText, label = "Label text", value = labelForm.get.labelText)
+                    @CSRF.formField
+                    @labelledTextInput(name = FieldNames.labelText, label = "Label text", value = labelForm.data.get(FieldNames.labelText))
                     <div class="w3-padding">
                         <label for="@FieldNames.targetGraph">Target Graph:</label>
                         <select id="@FieldNames.targetGraph" name="@FieldNames.targetGraph">
@@ -36,9 +41,15 @@
                         }
                         </select>
                     </div>
-                    @labelledTextInput(name = FieldNames.targetName, label = "Target name", value = labelForm.get.targetName)
-                    @button(value = "add", label = "Add and make another")
-                    @button(value = "finish", label = "Add and finish")
+                    @labelledTextInput(name = FieldNames.targetName, label = "Target name", value = labelForm.data.get(FieldNames.targetName))
+                    @button(value = "create", label = "Create")
+                    @button(value = "cancel", label = "Cancel")
+                }
+                </div>
+                @if(createdLabel.nonEmpty) {
+                <div class="w3-padding">
+                    <div>Successfully created label @createdLabel.get</div>
+                </div>
                 }
             </div>
         </div>

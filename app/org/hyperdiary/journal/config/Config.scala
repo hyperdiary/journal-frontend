@@ -1,3 +1,3 @@
 package org.hyperdiary.journal.config
 
-case class Config(hyperdiarySubdomain: String)
+case class Config(hyperdiarySubdomain: String, hyperdiaryHostname: String)

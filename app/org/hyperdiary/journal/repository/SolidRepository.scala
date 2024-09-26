@@ -23,4 +23,6 @@ trait SolidRepository {
 
   def createLabel(labelsModel: Model): Try[String]
 
+  def deleteLabel(labelUri: String): Try[Unit]
+
 }
