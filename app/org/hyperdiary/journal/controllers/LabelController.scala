@@ -1,12 +1,13 @@
 package org.hyperdiary.journal.controllers
 
-import org.hyperdiary.journal.services.{ LabelService, PersonService }
-import play.api.mvc.{ Action, AnyContent, BaseController, ControllerComponents, MessagesActionBuilder, MessagesRequest, Request }
-import org.hyperdiary.journal.forms.{ KnowledgeGraph, LabelDataFormProvider, LabelUriFormProvider }
-import org.hyperdiary.journal.vocabulary.{ DBpedia, PersonalKnowledgeGraph, Wikidata }
+import org.hyperdiary.journal.services.{LabelService, PersonService}
+import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents, MessagesActionBuilder, MessagesRequest, Request}
+import org.hyperdiary.journal.forms.{KnowledgeGraph, LabelDataFormProvider, LabelUriFormProvider}
+import org.hyperdiary.journal.vocabulary.{DBpedia, PersonalKnowledgeGraph, Wikidata}
 
 import javax.inject.Inject
-import scala.util.{ Failure, Success }
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class LabelController @Inject() (
   messagesAction: MessagesActionBuilder,
@@ -92,6 +93,11 @@ class LabelController @Inject() (
       case Some("cancel") => Ok(org.hyperdiary.journal.views.html.label())
       case _ => Ok(org.hyperdiary.journal.views.html.labelCreate(LabelDataFormProvider(), getKnowledgeGraphs))
     }
+  }
+
+  def getLink(label: String): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    val htmlLink = labelService.getHtmlHyperlink(label)
+    Future.successful(Ok(htmlLink))
   }
 
   private def getKnowledgeGraphs: Seq[KnowledgeGraph] =

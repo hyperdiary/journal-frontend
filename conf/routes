@@ -11,6 +11,7 @@ GET     /journal/:id/entry/:entryId     org.hyperdiary.journal.controllers.Journ
 GET     /person/:id                     org.hyperdiary.journal.controllers.PersonController.view(id: String)
 GET     /place/:id                      org.hyperdiary.journal.controllers.PlaceController.view(id: String)
 GET     /label                          org.hyperdiary.journal.controllers.LabelController.home()
+GET     /label/:label                   org.hyperdiary.journal.controllers.LabelController.getLink(label: String)
 POST    /label                          org.hyperdiary.journal.controllers.LabelController.navigate()
 GET     /label/create                   org.hyperdiary.journal.controllers.LabelController.create()
 POST    /label/create                   org.hyperdiary.journal.controllers.LabelController.submit()

@@ -5,8 +5,8 @@ import org.hyperdiary.journal.vocabulary.PersonalKnowledgeGraph
 trait BaseService {
 
   // TODO - this needs to go into configuration
-  // private val podBaseUri = "http://krw.hyperdiary.io"
-  val podBaseUri = "http://waltons.example.org"
+  val podBaseUri = "http://krw.hyperdiary.io"
+  //val podBaseUri = "http://waltons.example.org"
 
   // TODO - this needs to go into configuration
   val frontendBaseUri = "http://localhost:9000"

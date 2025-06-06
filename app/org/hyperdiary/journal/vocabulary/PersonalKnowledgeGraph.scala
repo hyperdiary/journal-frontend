@@ -14,5 +14,4 @@ class PersonalKnowledgeGraph @Inject (config: Config) {
   val photoBaseUri = s"$baseUri/photo/"
   val journalBaseUri = s"$baseUri/journal/"
   val entryBaseUri = s"$baseUri/entry/"
-
 }
