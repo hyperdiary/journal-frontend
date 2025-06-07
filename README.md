@@ -14,6 +14,10 @@ docker compose up
 ```
 
 To start:
-```
+```commandLine
 sbt run
+```
+To convert Markdown to JATS XML:
+```commandLine
+pandoc -t jats -o 03.xml 03.md
 ```
