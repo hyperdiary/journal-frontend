@@ -11,5 +11,4 @@ class DBpediaConnectorSpec extends PlaySpec {
     }
   }
 
-
 }

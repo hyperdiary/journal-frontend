@@ -1,26 +1,47 @@
 package org.hyperdiary.journal.services
 
 import org.apache.jena.rdf.model.{ Model, ModelFactory }
-import org.apache.jena.riot.{ RDFDataMgr, RDFFormat }
 import org.apache.jena.vocabulary.RDF
+import org.hyperdiary.journal.LabelAlreadyExists
+import org.hyperdiary.journal.repository.SolidRepository
 import org.hyperdiary.journal.vocabulary.{ DBpedia, HyperDiary, PersonalKnowledgeGraph, Wikidata }
 
-import java.io.StringWriter
+import javax.inject.{ Inject, Singleton }
 import scala.jdk.CollectionConverters.*
+import scala.util.{ Failure, Try }
 
-class LabelService(pkg: PersonalKnowledgeGraph) extends BaseService {
+@Singleton
+class LabelService @Inject (solidRepository: SolidRepository, pkg: PersonalKnowledgeGraph) extends BaseService {
 
-  def createLabel(label: String, target: String): String = {
-    // TODO check if label exists?
+  def createLabel(label: String, target: String): Try[String] =
+    solidRepository.getLabelLink(label) match {
+      case None =>
+        for {
+          labelModel <- createLabelModel(label, target)
+          result     <- solidRepository.createLabel(labelModel)
+          _          <- Try(labelModel.close())
+        } yield result
+      case Some(_) => Failure(LabelAlreadyExists())
+    }
+
+  def deleteLabel(labelName: String): Try[Unit] =
+    solidRepository.deleteLabel(s"${pkg.labelBaseUri}$labelName")
+
+  def getHtmlHyperlink(label: String): String = {
+    solidRepository.getLabelLink(label) match {
+      case Some(link) =>
+        val patchedLink = updateHtmlLink(link, pkg.baseUri) // TODO this is a temporary fix until deployed
+        s"<a href=\"$patchedLink\">$label</a>"
+      case _ => s"<span style=\"color:red;\">$label</span>"
+    }
+  }
+
+  private def createLabelModel(label: String, target: String): Try[Model] = Try {
     val model = getModel
     val labelResource = model.createResource(s"${pkg.labelBaseUri}${sanitise(label)}")
     val targetResource = model.createResource(target)
-    labelResource.addProperty(RDF.`type`, HyperDiary.Label)
-    labelResource.addProperty(HyperDiary.isLabelFor, targetResource)
-    val writer = new StringWriter()
-    RDFDataMgr.write(writer, model, RDFFormat.TURTLE)
-    model.close()
-    writer.toString
+    labelResource.addProperty(RDF.`type`, HyperDiary.Label).addProperty(HyperDiary.isLabelFor, targetResource)
+    model
   }
 
   private def getModel: Model = {

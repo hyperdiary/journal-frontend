@@ -1,0 +1,38 @@
+@import helper._
+@import org.hyperdiary.journal.forms.LabelUri
+
+@(uriForm: Form[LabelUri], deletedLabel: Option[String] = None)(implicit request: MessagesRequestHeader)
+
+@button(value: String, label: String) = {
+    <button name="action" value="@value" class="w3-btn w3-teal">@label</button>
+}
+
+@main("Delete a Label") {
+    <header class="w3-container w3-teal">
+        <h1>Delete a Label</h1>
+    </header>
+    <article class="w3-container w3-monospace">
+        <div class="w3-row">
+            <div class="w3-col m8 l9">
+                <div class="w3-padding">
+                @form(action = org.hyperdiary.journal.controllers.routes.LabelController.deleteLabel()) {
+                    @CSRF.formField
+                    <label for="uri">Label URI:</label>
+                    <input type="text" name="uri" id="uri" value=""/>
+                    @uriForm.error("uri").map { error =>
+                        <span style="color:red;">@error.format</span>
+                    }
+                    @button(value = "delete", label = "Delete")
+                    @button(value = "cancel", label = "Cancel")
+                }
+                </div>
+                @if(deletedLabel.nonEmpty) {
+                    <div class="w3-padding">
+                        <div>Successfully deleted label @deletedLabel.get</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </article>
+    <footer class="w3-container w3-teal"></footer>
+}

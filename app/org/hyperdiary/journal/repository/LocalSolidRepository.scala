@@ -1,22 +1,22 @@
 package org.hyperdiary.journal.repository
-import com.inrupt.client.Request
+import com.inrupt.client.{ Request, Response }
 import com.inrupt.client.auth.Session
-import com.inrupt.client.jena.JenaBodyHandlers
+import com.inrupt.client.jena.{ JenaBodyHandlers, JenaBodyPublishers }
 import com.inrupt.client.openid.OpenIdSession
 import com.inrupt.client.solid.SolidSyncClient
-import org.apache.jena.query.QueryFactory
-import org.apache.jena.rdf.model.{Model, ModelFactory, RDFNode}
-import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder
-import org.hyperdiary.journal.models.{Entry, Journal, Person, Place, Residence}
+import org.apache.jena.rdf.model.{ Model, ModelFactory, RDFNode }
+import org.hyperdiary.journal.models.*
 import org.hyperdiary.journal.services.BaseService
-import org.hyperdiary.journal.vocabulary.HyperDiary
+import org.hyperdiary.journal.vocabulary.{ HyperDiary, PersonalKnowledgeGraph }
 
-import java.io.ByteArrayInputStream
 import java.net.URI
-import javax.inject.{Inject, Singleton}
+import java.net.http.HttpRequest.BodyPublisher
+import javax.inject.{ Inject, Singleton }
+import scala.jdk.CollectionConverters.*
+import scala.util.{ Failure, Success, Try }
 
 @Singleton
-class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
+class LocalSolidRepository @Inject (pkg: PersonalKnowledgeGraph) extends SolidRepository with BaseService {
 
   private val session: Session = OpenIdSession.ofClientCredentials(
     new URI("http://localhost:3000/"),
@@ -47,22 +47,28 @@ class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
       .replaceAll("[,'()]", "")
       .replaceAll("\\.$", "")
       .replace("(", "")
-      .replace(")", "").toLowerCase()
-    val labelUri = s"$cssPodUri/label/$labelLocalName"
+      .replace(")", "")
+      .toLowerCase()
+    val labelUri = s"${pkg.labelBaseUri}$labelLocalName"
     val request = Request.newBuilder().uri(URI.create(labelUri)).GET().build()
-    val response = client.send(request, JenaBodyHandlers.ofModel())
-    if (response.body().isEmpty) {
-      None
-    } else {
-      val model = response.body()
-      val stmt = model.getProperty(
-        model.createResource(s"$podBaseUri/label/$labelLocalName"),
-        model.createProperty(HyperDiary.uri, "isLabelFor")
-      )
-      Some(stmt.getObject.toString)
+    Try(client.send(request, JenaBodyHandlers.ofModel())) match {
+      case Success(response) =>
+        if (response.body().isEmpty) {
+          None
+        } else {
+          val model = response.body()
+          val stmt = model.getProperty(
+            model.createResource(s"$podBaseUri/label/$labelLocalName"),
+            model.createProperty(HyperDiary.uri, "isLabelFor")
+          )
+          Some(stmt.getObject.toString)
+        }
+      case Failure(e) =>
+        // TODO log error
+        None
     }
   }
-  
+
   override def getPerson(personUri: String): Option[Person] = {
     val request = Request.newBuilder().uri(URI.create(personUri)).GET().build()
     val response = client.send(request, JenaBodyHandlers.ofModel())
@@ -79,5 +85,27 @@ class LocalSolidRepository @Inject() extends SolidRepository with BaseService {
     val request = Request.newBuilder().uri(URI.create(placeUri)).GET().build()
     val response = client.send(request, JenaBodyHandlers.ofModel())
     Place.fromModel(response.body())
+  }
+
+  override def createLabel(labelsModel: Model): Try[String] = Try {
+    val labelResource = labelsModel.listSubjects().toList.asScala.head
+    val labelModel = labelResource.listProperties().toModel
+    val labelUri = labelResource.getURI
+    val request = Request
+      .newBuilder()
+      .uri(URI.create(labelUri))
+      .header("Content-Type", "text/turtle")
+      .PUT(JenaBodyPublishers.ofModel(labelModel))
+      .build()
+    val response = client.send(request, Response.BodyHandlers.discarding())
+    if (response.statusCode() == 201) {
+      labelUri
+    } else {
+      throw new RuntimeException("oops!") // TODO(RW) improve this!
+    }
+  }
+
+  override def deleteLabel(labelUri: String): Try[Unit] = Try {
+    client.delete(new URI(labelUri))
   }
 }

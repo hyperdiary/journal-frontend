@@ -22,5 +22,4 @@ object HyperDiary {
 
   val isLabelFor: Property = ResourceFactory.createProperty(s"${uri}isLabelFor")
 
-
 }

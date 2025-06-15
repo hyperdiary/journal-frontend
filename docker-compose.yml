@@ -10,6 +10,15 @@ services:
       - ~/Solid:/data
       - ~/solid-config:/config
     image: solidproject/community-server:latest
+    platform: linux/amd64
+  elemental:
+    container_name: elemental
+    ports:
+      - 8080:8080
+    volumes:
+      - /elemental/data
+    image: evolvedbinary/elemental:latest
+    platform: linux/amd64
 #  rdf4j-workbench:
 #    container_name: rdf4j_dbpedia
 #    environment:

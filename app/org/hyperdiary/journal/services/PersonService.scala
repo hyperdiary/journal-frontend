@@ -3,6 +3,7 @@ package org.hyperdiary.journal.services
 import org.hyperdiary.journal.connectors.DBpediaConnector
 import org.hyperdiary.journal.models.*
 import org.hyperdiary.journal.repository.SolidRepository
+import org.hyperdiary.journal.vocabulary.PersonalKnowledgeGraph
 
 import java.net.URI
 import java.time.LocalDate
@@ -10,12 +11,12 @@ import java.time.format.DateTimeFormatter
 import javax.inject.{ Inject, Singleton }
 
 @Singleton
-class PersonService @Inject() (solidRepository: SolidRepository) extends BaseService {
+class PersonService @Inject (pkg: PersonalKnowledgeGraph)(solidRepository: SolidRepository) extends BaseService {
 
-  private val solidPersonBaseUri = s"$cssPodUri/person"
+  // private val solidPersonBaseUri = s"$cssPodUri/person"
 
   def getPerson(personId: String): Option[PersonHtml] = {
-    val personUri = s"$solidPersonBaseUri/$personId"
+    val personUri = s"${pkg.personBaseUri}$personId"
     for {
       person <- solidRepository.getPerson(personUri)
     } yield PersonHtml(
@@ -38,7 +39,7 @@ class PersonService @Inject() (solidRepository: SolidRepository) extends BaseSer
   }
 
   private def getParents(parentsUris: List[String]): Parents = {
-    val parents = parentsUris.flatMap(parentUri => solidRepository.getPerson(updateUri(parentUri)))
+    val parents = parentsUris.flatMap(parentUri => solidRepository.getPerson(updateUri(parentUri, pkg.baseUri)))
     Parents(getMother(parents), getFather(parents))
   }
 
@@ -57,7 +58,7 @@ class PersonService @Inject() (solidRepository: SolidRepository) extends BaseSer
     }
 
   private def getPersonLinks(personUris: List[String]): List[LabelledLink] = {
-    val people = personUris.map(personUri => solidRepository.getPerson(updateUri(personUri)))
+    val people = personUris.map(personUri => solidRepository.getPerson(updateUri(personUri, pkg.baseUri)))
     people.flatten.map { person =>
       LabelledLink(
         person.label.getOrElse(person.givenName),
@@ -69,7 +70,7 @@ class PersonService @Inject() (solidRepository: SolidRepository) extends BaseSer
   private def getResidenceLinks(residenceUris: List[String]): List[LabelledLink] =
     for {
       residence <- getResidences(residenceUris)
-      place     <- solidRepository.getPlace(updateUri(residence.locationUri))
+      place     <- solidRepository.getPlace(updateUri(residence.locationUri, pkg.baseUri))
     } yield LabelledLink(getResidenceLabel(residence, place), new URI(s"$frontendBaseUri/place/${place.identifier}"))
 
   private def getResidenceLabel(residence: Residence, place: Place): String = {
@@ -84,7 +85,7 @@ class PersonService @Inject() (solidRepository: SolidRepository) extends BaseSer
   private def getResidences(residenceUris: List[String]): List[Residence] =
     for {
       residenceUri <- residenceUris
-      residence    <- solidRepository.getResidence(updateUri(residenceUri))
+      residence    <- solidRepository.getResidence(updateUri(residenceUri, pkg.baseUri))
     } yield residence
 
   private def getEventDate(maybeEventDate: Option[String]): Option[Either[String, LocalDate]] = {

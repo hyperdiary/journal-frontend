@@ -1,0 +1,27 @@
+@import helper._
+
+@()(implicit request: MessagesRequestHeader)
+
+@button(value: String, label: String) = {
+    <button name="action" value="@value" class="w3-btn w3-teal">@label</button>
+}
+
+@main("Label Manager") {
+    <header class="w3-container w3-teal">
+        <h1>Label Manager</h1>
+    </header>
+    <article class="w3-container w3-monospace">
+        <div class="w3-row">
+            <div class="w3-col m8 l9">
+                <div class="w3-padding">
+                @form(action = org.hyperdiary.journal.controllers.routes.LabelController.navigate()) {
+                    @CSRF.formField
+                    @button(value = "create", label = "Create a label")
+                    @button(value = "delete", label = "Delete a label")
+                }
+                </div>
+            </div>
+        </div>
+    </article>
+    <footer class="w3-container w3-teal"></footer>
+}
