@@ -1,13 +1,13 @@
 package org.hyperdiary.journal.controllers
 
-import org.hyperdiary.journal.services.{LabelService, PersonService}
-import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents, MessagesActionBuilder, MessagesRequest, Request}
-import org.hyperdiary.journal.forms.{KnowledgeGraph, LabelDataFormProvider, LabelUriFormProvider}
-import org.hyperdiary.journal.vocabulary.{DBpedia, PersonalKnowledgeGraph, Wikidata}
+import org.hyperdiary.journal.services.{ LabelService, PersonService }
+import play.api.mvc.{ Action, AnyContent, BaseController, ControllerComponents, MessagesActionBuilder, MessagesRequest, Request }
+import org.hyperdiary.journal.forms.{ KnowledgeGraph, LabelDataFormProvider, LabelUriFormProvider }
+import org.hyperdiary.journal.vocabulary.{ DBpedia, PersonalKnowledgeGraph, Wikidata }
 
 import javax.inject.Inject
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 
 class LabelController @Inject() (
   messagesAction: MessagesActionBuilder,
@@ -85,7 +85,10 @@ class LabelController @Inject() (
             labelData =>
               labelService.createLabel(labelData.labelText, s"${labelData.targetGraph}${labelData.targetName}") match {
                 case Success(labelUri) =>
-                  Ok(org.hyperdiary.journal.views.html.labelCreate(LabelDataFormProvider(), getKnowledgeGraphs, Some(labelUri)))
+                  Ok(
+                    org.hyperdiary.journal.views.html
+                      .labelCreate(LabelDataFormProvider(), getKnowledgeGraphs, Some(labelUri))
+                  )
                 case Failure(e) =>
                   BadRequest(org.hyperdiary.journal.views.html.labelCreate(LabelDataFormProvider(), getKnowledgeGraphs))
               }

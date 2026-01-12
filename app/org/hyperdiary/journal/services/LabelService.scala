@@ -27,14 +27,13 @@ class LabelService @Inject (solidRepository: SolidRepository, pkg: PersonalKnowl
   def deleteLabel(labelName: String): Try[Unit] =
     solidRepository.deleteLabel(s"${pkg.labelBaseUri}$labelName")
 
-  def getHtmlHyperlink(label: String): String = {
+  def getHtmlHyperlink(label: String): String =
     solidRepository.getLabelLink(label) match {
       case Some(link) =>
         val patchedLink = updateHtmlLink(link, pkg.baseUri) // TODO this is a temporary fix until deployed
         s"<a href=\"$patchedLink\">$label</a>"
       case _ => s"<span style=\"color:red;\">$label</span>"
     }
-  }
 
   private def createLabelModel(label: String, target: String): Try[Model] = Try {
     val model = getModel
