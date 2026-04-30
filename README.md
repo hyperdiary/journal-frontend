@@ -15,16 +15,16 @@ Journal entries, people, and places are modelled using a custom HyperDiary RDF v
 
 | Layer | Technology |
 |---|---|
-| Web framework | Play Framework 2.9 / Scala 3.3 |
-| RDF processing | Apache Jena 4.10 |
-| Solid client | Inrupt Java Client SDK 1.1 |
+| Web framework | Play Framework 3.0.7 / Scala 3.3.1 |
+| RDF processing | Apache Jena 6.0.0 |
+| Solid client | Inrupt Java Client SDK 2.0.0 |
 | Solid server | Community Solid Server (Docker) |
 | RDF triple store | Elemental (Docker, port 8080) |
-| Build tool | sbt |
+| Build tool | sbt 1.9.8 |
 
 ## Prerequisites
 
-- Java 11+
+- Java 21+
 - sbt
 - Docker / Docker Compose
 
