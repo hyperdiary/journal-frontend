@@ -2,8 +2,9 @@ package org.hyperdiary.journal.repository
 
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.riot.RDFDataMgr
-import org.hyperdiary.journal.models.{ Entry, Journal, Person, Place, Residence }
+import org.hyperdiary.journal.models.{Entry, Journal, Person, Place, Residence}
 
+import java.io.StringWriter
 import scala.util.Try
 
 class TestSolidRepository extends SolidRepository {
@@ -16,7 +17,7 @@ class TestSolidRepository extends SolidRepository {
 
   override def getJournal(journalUri: String): Option[Journal] = ???
 
-  override def getLabelLink(labelText: String): Option[String] = ???
+  override def getLabelLink(labelText: String): Option[String] = Option.empty
 
   override def getPerson(personUri: String): Option[Person] = ???
 
@@ -24,5 +25,12 @@ class TestSolidRepository extends SolidRepository {
 
   override def getResidence(residenceUri: String): Option[Residence] = ???
 
-  override def createLabel(labelsModel: Model): Try[String] = ???
+  override def createLabel(labelsModel: Model): Try[String] = {
+    val out = new StringWriter()
+    // "lang" can be "TURTLE", "JSON-LD", "RDF/XML", "N-TRIPLES", etc.
+    labelsModel.write(out, "TURTLE")
+    Try(out.toString)
+  }
+
+  override def deleteLabel(labelUri: String): Try[Unit] = ???
 }

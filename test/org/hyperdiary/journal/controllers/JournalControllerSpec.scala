@@ -1,8 +1,10 @@
 package org.hyperdiary.journal.controllers
 
+import org.hyperdiary.journal.config.Config
 import org.hyperdiary.journal.controllers.JournalController
 import org.hyperdiary.journal.repository.TestSolidRepository
 import org.hyperdiary.journal.services.JournalService
+import org.hyperdiary.journal.vocabulary.PersonalKnowledgeGraph
 import org.scalatestplus.play.*
 import org.scalatestplus.play.guice.*
 import play.api.test.*
@@ -17,7 +19,8 @@ class JournalControllerSpec extends PlaySpec with GuiceOneAppPerTest with Inject
   "HomeController GET" should {
 
     "render the index page from a new instance of controller" in {
-      val service = new JournalService(new TestSolidRepository())
+      val pkg = new PersonalKnowledgeGraph(Config("example", "localhost"))
+      val service = new JournalService(pkg)(new TestSolidRepository())
       val controller = new JournalController(stubControllerComponents(), service)
       val home = controller.index().apply(FakeRequest(GET, "/"))
 
